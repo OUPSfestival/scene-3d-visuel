@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scène 3D</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #1a1a2e; font-family: system-ui, -apple-system, sans-serif; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+
+        #drop-zone {
+            position: fixed; inset: 0; z-index: 20;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #1a1a2e; color: #ccc; gap: 1.2rem; text-align: center; padding: 2rem;
+        }
+        #drop-zone.hidden { display: none; }
+        #drop-zone.drag-over { background: #2a2a4e; }
+        .drop-box {
+            width: 340px; padding: 50px 40px;
+            border: 2px dashed rgba(124, 108, 240, 0.5); border-radius: 16px;
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
+        }
+        .drop-box:hover, #drop-zone.drag-over .drop-box {
+            border-color: #7c6cf0; background: rgba(124, 108, 240, 0.08);
+        }
+        .drop-box h2 { font-size: 1.3rem; margin-bottom: 0.6rem; color: #e0e0ff; }
+        .drop-box p { font-size: 0.9rem; color: #888; }
+        .drop-box input { display: none; }
+        .drop-box .icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+
+        #loading {
+            position: fixed; inset: 0; z-index: 15;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            background: #1a1a2e; color: #ccc; font-size: 1.1rem; gap: 1.2rem;
+        }
+        #loading.active { display: flex; }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid rgba(255,255,255,0.15); border-top-color: #7c6cf0;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #controls-info {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 5;
+            text-align: center; padding: 10px 16px;
+            background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+            color: rgba(255,255,255,0.7); font-size: 0.85rem;
+        }
+        #controls-info.hidden { display: none; }
+
+        /* Responsive - Téléphones */
+        @media (max-width: 768px) {
+            .drop-box {
+                width: 90%; max-width: 300px;
+                padding: 40px 30px;
+            }
+            .drop-box h2 { font-size: 1.1rem; }
+            .drop-box p { font-size: 0.8rem; }
+            .drop-box .icon { font-size: 2rem; }
+            
+            #drop-zone {
+                gap: 0.8rem;
+                padding: 1rem;
+            }
+            
+            #drop-zone > p { font-size: 0.7rem; }
+            
+            #controls-info {
+                padding: 8px 12px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .drop-box {
+                width: 95%;
+                padding: 30px 20px;
+            }
+            .drop-box h2 { font-size: 1rem; }
+            .drop-box .icon { font-size: 1.8rem; }
+            
+            #controls-info {
+                padding: 6px 10px;
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ImportMap pour les modules ES6 -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+        "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.150.1/examples/jsm/controls/OrbitControls.js",
+        "three/addons/loaders/GLTFLoader.js": "https://unpkg.com/three@0.150.1/examples/jsm/loaders/GLTFLoader.js"
+      }
+    }
+    </script>
+
+    <!-- Zone de drop -->
+    <div id="drop-zone">
+        <div class="drop-box" id="drop-box">
+            <div class="icon">📦</div>
+            <h2>Glisse ton fichier .glb ici</h2>
+            <p>ou clique pour sélectionner</p>
+            <input type="file" id="file-input" accept=".glb,.gltf">
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.8rem; color: #666;">
+            Fichier exporté depuis Blender au format glTF Binary (.glb)
+        </p>
+    </div>
+
+    <!-- Chargement -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Chargement de la scène 3D…</p>
+    </div>
+
+    <!-- Contrôles info -->
+    <div id="controls-info" class="hidden">
+        <p>🖱️ Clic gauche : tourner &nbsp;|&nbsp; Molette : zoomer &nbsp;|&nbsp; Clic droit : déplacer</p>
+    </div>
+
+    <!-- Canvas pour la scène 3D -->
+    <canvas id="scene3d"></canvas>
+
+    <!-- Three.js depuis CDN -->
+
+    <!-- Chargement du viewer Three.js en module ES -->
+    <script type="module" src="./viewer.js"></script>
+
+</body>
+</html>
