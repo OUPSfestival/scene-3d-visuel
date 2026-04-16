@@ -6,16 +6,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 async function initViewer() {
     // Éléments DOM
     const canvas = document.getElementById('scene3d');
-    const dropZone = document.getElementById('drop-zone');
     const loadingEl = document.getElementById('loading');
     const controlsInfo = document.getElementById('controls-info');
-    const fileInput = document.getElementById('file-input');
-    const dropBox = document.getElementById('drop-box');
 
     // Vérifier que tous les éléments existent
-    if (!canvas || !dropZone || !loadingEl || !fileInput || !dropBox) {
+    if (!canvas || !loadingEl) {
         console.error('Erreur : éléments DOM manquants');
-        console.log({ canvas, dropZone, loadingEl, fileInput, dropBox });
+        console.log({ canvas, loadingEl });
         return;
     }
 
@@ -64,125 +61,67 @@ async function initViewer() {
     // Loader pour les modèles glTF / GLB
     const loader = new GLTFLoader();
 
-    // Stockage du modèle actuel pour le remplacer
+    // Stockage du modèle actuel
     let currentModel = null;
 
-    // Fonction pour charger et afficher un modèle
-    function loadModel(file) {
-        const reader = new FileReader();
+    // Fonction pour charger et afficher un modèle depuis une URL
+    function loadModelFromURL(modelPath) {
+        // Afficher le loader
+        loadingEl.classList.add('active');
         
-        reader.onload = (e) => {
-            // Afficher le loader
-            loadingEl.classList.add('active');
-            dropZone.classList.add('hidden');
-            
-            try {
-                const arrayBuffer = e.target.result;
+        loader.load(
+            modelPath,
+            (gltf) => {
+                // Retirer l'ancien modèle
+                if (currentModel) {
+                    scene.remove(currentModel);
+                }
                 
-                loader.parse(
-                    arrayBuffer,
-                    file.name.substring(0, file.name.lastIndexOf('/') + 1),
-                    (gltf) => {
-                        // Retirer l'ancien modèle
-                        if (currentModel) {
-                            scene.remove(currentModel);
-                        }
-                        
-                        const model = gltf.scene;
-                        currentModel = model;
+                const model = gltf.scene;
+                currentModel = model;
 
-                        // Centrer le modèle automatiquement
-                        const box = new THREE.Box3().setFromObject(model);
-                        const center = box.getCenter(new THREE.Vector3());
-                        const size = box.getSize(new THREE.Vector3());
+                // Centrer le modèle automatiquement
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
 
-                        model.position.sub(center);
+                model.position.sub(center);
 
-                        // Ajuster la caméra selon la taille du modèle
-                        const maxDim = Math.max(size.x, size.y, size.z);
-                        const distance = maxDim * 2;
-                        camera.position.set(distance * 0.7, distance * 0.5, distance);
-                        camera.near = maxDim * 0.001;
-                        camera.far = maxDim * 100;
-                        camera.updateProjectionMatrix();
+                // Ajuster la caméra selon la taille du modèle
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const distance = maxDim * 2;
+                camera.position.set(distance * 0.7, distance * 0.5, distance);
+                camera.near = maxDim * 0.001;
+                camera.far = maxDim * 100;
+                camera.updateProjectionMatrix();
 
-                        controls.target.set(0, 0, 0);
-                        controls.minDistance = maxDim * 0.1;
-                        controls.maxDistance = maxDim * 10;
-                        controls.update();
+                controls.target.set(0, 0, 0);
+                controls.minDistance = maxDim * 0.1;
+                controls.maxDistance = maxDim * 10;
+                controls.update();
 
-                        scene.add(model);
+                scene.add(model);
 
-                        // Masquer le loader et afficher les contrôles
-                        loadingEl.classList.remove('active');
-                        controlsInfo.classList.remove('hidden');
-                        console.log('✅ Modèle chargé avec succès');
-                    },
-                    (error) => {
-                        console.error('Erreur de parsing du modèle :', error);
-                        loadingEl.querySelector('p').textContent =
-                            '❌ Impossible de charger le modèle. Format non reconnu.';
-                        loadingEl.querySelector('.spinner').style.display = 'none';
-                    }
-                );
-            } catch (error) {
-                console.error('Erreur :', error);
-                loadingEl.querySelector('p').textContent = '❌ Erreur lors du chargement.';
+                // Masquer le loader et afficher les contrôles
+                loadingEl.classList.remove('active');
+                controlsInfo.classList.remove('hidden');
+                console.log('✅ Modèle chargé avec succès');
+            },
+            (progress) => {
+                console.log('Chargement...', Math.round(progress.loaded / progress.total * 100) + '%');
+            },
+            (error) => {
+                console.error('Erreur lors du chargement du modèle :', error);
+                loadingEl.querySelector('p').textContent =
+                    '❌ Impossible de charger model.glb';
                 loadingEl.querySelector('.spinner').style.display = 'none';
             }
-        };
-
-        reader.onerror = () => {
-            loadingEl.classList.remove('active');
-            alert('Erreur lors de la lecture du fichier');
-        };
-
-        reader.readAsArrayBuffer(file);
+        );
     }
 
-    // Gestion du drag-and-drop
-    document.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.add('drag-over');
-    });
-
-    document.addEventListener('dragleave', (e) => {
-        if (e.target === document) {
-            dropZone.classList.remove('drag-over');
-        }
-    });
-
-    document.addEventListener('drop', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove('drag-over');
-
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            const file = files[0];
-            const ext = file.name.split('.').pop().toLowerCase();
-            if (['glb', 'gltf'].includes(ext)) {
-                console.log('📁 Fichier détecté :', file.name);
-                loadModel(file);
-            } else {
-                alert('Seuls les fichiers .glb et .gltf sont acceptés.');
-            }
-        }
-    });
-
-    // Gestion du clic sur la zone de drop
-    dropBox.addEventListener('click', () => {
-        console.log('🖱️ Clic sur la zone de drop');
-        fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            console.log('📁 Fichier sélectionné :', e.target.files[0].name);
-            loadModel(e.target.files[0]);
-        }
-    });
+    // Charger automatiquement model.glb au démarrage
+    console.log('🚀 Chargement automatique de model.glb...');
+    loadModelFromURL('./model.glb');
 
     // Redimensionnement
     window.addEventListener('resize', () => {
@@ -214,23 +153,3 @@ if (document.readyState === 'loading') {
     // Le DOM est déjà chargé
     initViewer();
 }
-
-// Redimensionnement
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-// Désactiver l'auto-rotate au premier clic
-controls.addEventListener('start', () => {
-    controls.autoRotate = false;
-});
-
-// Boucle de rendu
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-}
-animate();
