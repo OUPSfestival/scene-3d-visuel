@@ -24,28 +24,85 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #controls-info {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 5;
-            text-align: center; padding: 10px 16px;
-            background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
-            color: rgba(255,255,255,0.7); font-size: 0.85rem;
+        /* ── Detail View ──────────────────────────────────── */
+        #detail-view {
+            position: fixed; inset: 0; z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
-        #controls-info.hidden { display: none; }
+        #detail-view.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Bouton retour */
+        #back-btn {
+            position: absolute; top: 30px; left: 30px;
+            background: none; border: none; cursor: pointer; padding: 0;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: all;
+        }
+        #back-btn svg { transition: transform 0.2s; }
+        #back-btn:hover svg { transform: translateX(-5px); }
+
+        /* Texte bas-gauche */
+        #detail-text {
+            position: absolute; bottom: 50px; left: 44px;
+            max-width: 440px; color: white; pointer-events: none;
+        }
+        #detail-title {
+            font-size: 2rem; font-weight: bold; font-style: italic;
+            margin-bottom: 0.9rem; letter-spacing: 0.01em;
+        }
+        #detail-desc {
+            font-size: 0.85rem; line-height: 1.75;
+            color: rgba(255,255,255,0.82);
+        }
+
+        /* Panneau images droite */
+        #detail-images {
+            position: absolute; top: 0; right: 0; bottom: 0; width: 340px;
+            background: rgba(8, 8, 22, 0.88);
+            backdrop-filter: blur(12px);
+            overflow-y: auto; padding: 24px 18px;
+            transform: translateX(340px);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: all;
+        }
+        #detail-view.visible #detail-images { transform: translateX(0); }
+
+        /* Items figure */
+        .figure-item { margin-bottom: 32px; }
+        .figure-item img {
+            width: 100%; display: block; object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .figure-caption { padding: 10px 2px 0; }
+        .figure-caption strong {
+            display: block; font-size: 0.95rem; font-style: italic;
+            color: white; margin-bottom: 5px;
+        }
+        .figure-caption p {
+            font-size: 0.73rem; line-height: 1.55;
+            color: rgba(255,255,255,0.65);
+        }
+
+        /* Responsive mobile */
+        @media (max-width: 768px) {
+            #detail-images {
+                width: 100%; height: 45vh;
+                top: auto; right: 0; left: 0;
+                transform: translateY(100%);
+                transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            #detail-view.visible #detail-images { transform: translateY(0); }
+            #detail-text { bottom: 48%; left: 20px; max-width: calc(100% - 40px); }
+        }
 
         /* Responsive - Téléphones */
-        @media (max-width: 768px) {
-            #controls-info {
-                padding: 8px 12px;
-                font-size: 0.7rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #controls-info {
-                padding: 6px 10px;
-                font-size: 0.65rem;
-            }
-        }
+
     </style>
 </head>
 <body>
@@ -56,7 +113,8 @@
       "imports": {
         "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
         "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.150.1/examples/jsm/controls/OrbitControls.js",
-        "three/addons/loaders/GLTFLoader.js": "https://unpkg.com/three@0.150.1/examples/jsm/loaders/GLTFLoader.js"
+        "three/addons/loaders/GLTFLoader.js": "https://unpkg.com/three@0.150.1/examples/jsm/loaders/GLTFLoader.js",
+        "three/addons/loaders/RGBELoader.js": "https://unpkg.com/three@0.150.1/examples/jsm/loaders/RGBELoader.js"
       }
     }
     </script>
@@ -67,13 +125,24 @@
         <p>Chargement de la scène 3D…</p>
     </div>
 
-    <!-- Contrôles info -->
-    <div id="controls-info" class="hidden">
-        <p>🖱️ Clic gauche : tourner &nbsp;|&nbsp; Molette : zoomer &nbsp;|&nbsp; Clic droit : déplacer</p>
-    </div>
-
     <!-- Canvas pour la scène 3D -->
     <canvas id="scene3d"></canvas>
+
+    <!-- Overlay détail : visible au clic sur une forme -->
+    <div id="detail-view">
+        <button id="back-btn" aria-label="Retour">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M38 16 L18 32 L38 48" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <div id="detail-text">
+            <h2 id="detail-title"></h2>
+            <p id="detail-desc"></p>
+        </div>
+        <div id="detail-images">
+            <div id="images-list"></div>
+        </div>
+    </div>
 
     <!-- Three.js depuis CDN -->
 
