@@ -61,10 +61,10 @@ async function initViewer() {
     controls.autoRotateSpeed = 1.0;
 
     // Lumières — contraste fort, source principale en haut
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.15); // très faible : laisse les ombres sombres
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.04); // quasi nul : ombres très sombres
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 2.5); // forte, quasi verticale
+    const dirLight = new THREE.DirectionalLight(0xffffff, 4.0); // très forte, quasi verticale
     dirLight.position.set(2, 20, 5);  // presque directement au-dessus
     scene.add(dirLight);
 
