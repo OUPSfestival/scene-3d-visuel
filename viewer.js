@@ -28,24 +28,25 @@ async function initViewer() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 2.5;   // exposition haute pour correspondre au viewport Blender plein jour
     renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.sortObjects = true;          // tri correct des objets transparents
 
     // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a2e);
+    scene.background = new THREE.Color(0xe8e8e8); // fond gris clair neutre (comme Blender material preview)
 
-    // Environment map HDR nature (reflets dans les matériaux métalliques)
+    // Environment map HDR — ciel clair neutre pour reflets blancs sur métaux
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new RGBELoader().load(
-        'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/forest_slope_1k.hdr',
+        'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloppenheim_02_1k.hdr',
         (hdrTexture) => {
             const envMap = pmremGenerator.fromEquirectangular(hdrTexture).texture;
-            scene.environment = envMap; // reflets sur tous les matériaux PBR
+            scene.environment = envMap; // reflets IBL sur tous les matériaux PBR
             hdrTexture.dispose();
             pmremGenerator.dispose();
-            console.log('✅ HDR nature chargé');
+            console.log('✅ HDR ciel clair chargé');
         }
     );
 
@@ -60,16 +61,16 @@ async function initViewer() {
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.0;
 
-    // Lumières
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Lumières — blanches et uniformes pour correspondre à plein jour
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
     dirLight.position.set(5, 10, 7);
     scene.add(dirLight);
 
-    const fillLight = new THREE.DirectionalLight(0x8888ff, 0.4);
-    fillLight.position.set(-5, 2, -5);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    fillLight.position.set(-5, 3, -5);
     scene.add(fillLight);
 
     // Loader pour les modèles glTF / GLB
@@ -236,17 +237,42 @@ async function initViewer() {
                 originalMaxDist = controls.maxDistance;
                 controls.update();
 
-                // Forcer la transparence sur tous les matériaux qui en ont besoin
-                // (inclut les matériaux déjà marqués transparent par GLTFLoader via alphaMode:BLEND)
+                // Forcer la transparence sur tous les matériaux concernés
+                // Cas couverts :
+                //   - matériaux déjà flag transparent par GLTFLoader (alphaMode:BLEND)
+                //   - opacity strictement < 1 (y compris valeurs comme 0.99)
+                //   - alphaMap ou alphaTest (alphaMode:MASK)
+                //   - MeshPhysicalMaterial avec transmission (verre physique)
                 model.traverse((node) => {
                     if (node.isMesh) {
-                        const materials = Array.isArray(node.material) ? node.material : [node.material];
-                        materials.forEach((mat) => {
-                            if (mat.transparent || mat.opacity < 1 || mat.alphaMap || mat.alphaTest > 0) {
+                        const mats = Array.isArray(node.material) ? node.material : [node.material];
+                        mats.forEach((mat) => {
+                            // Debug : affiche l'état de chaque matériau dans la console
+                            console.log(`  Mat «${mat.name}» : opacity=${mat.opacity.toFixed(2)}, transparent=${mat.transparent}, transmission=${mat.transmission ?? 0}`);
+
+                            const needsBlend =
+                                mat.transparent ||
+                                mat.opacity < 0.999 ||
+                                mat.alphaMap != null ||
+                                mat.alphaTest > 0 ||
+                                (mat.transmission != null && mat.transmission > 0);
+
+                            if (needsBlend) {
                                 mat.transparent = true;
-                                mat.depthWrite = false;
+                                mat.depthWrite  = false;
                                 mat.needsUpdate = true;
                             }
+                        });
+                    }
+                });
+
+                // Double-face sur tous les meshes (utile pour grease pencil tubes)
+                model.traverse((node) => {
+                    if (node.isMesh && node.material) {
+                        const mats = Array.isArray(node.material) ? node.material : [node.material];
+                        mats.forEach((mat) => {
+                            if (mat.side === THREE.FrontSide) mat.side = THREE.DoubleSide;
+                            mat.needsUpdate = true;
                         });
                     }
                 });
