@@ -247,6 +247,10 @@ async function initViewer() {
                                 mat.depthWrite = false;
                                 mat.needsUpdate = true;
                             }
+                            // Booster les reflets env map pour simuler l'effet IOR élevé (chrome)
+                            // IOR 58 = f0 ≈ 0.93 → réflectivité miroir à toutes les incidences
+                            mat.envMapIntensity = 3.0;
+                            mat.needsUpdate = true;
                         });
                     }
                 });
