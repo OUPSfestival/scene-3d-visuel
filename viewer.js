@@ -28,24 +28,27 @@ async function initViewer() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.0;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a2e);
+    // Fond : sera remplacé par l'HDR flouté une fois chargé (comme Blender Material Preview)
+    scene.background = new THREE.Color(0x888880);
 
-    // Environment map HDR nature (reflets dans les matériaux métalliques)
+    // Environment map HDR — reflets ET fond de scène (comme Blender)
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new RGBELoader().load(
         'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/forest_slope_1k.hdr',
         (hdrTexture) => {
             const envMap = pmremGenerator.fromEquirectangular(hdrTexture).texture;
-            scene.environment = envMap; // reflets sur tous les matériaux PBR
+            scene.environment = envMap;          // IBL : reflets sur tous les matériaux PBR
+            scene.background  = envMap;          // fond de scène = même HDR
+            scene.backgroundBlurriness = 0.6;    // floué comme dans le viewport Blender
             hdrTexture.dispose();
             pmremGenerator.dispose();
-            console.log('✅ HDR nature chargé');
+            console.log('✅ HDR chargé — fond + reflets actifs');
         }
     );
 
@@ -60,12 +63,12 @@ async function initViewer() {
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.0;
 
-    // Lumières — contraste fort, source principale en haut
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.04); // quasi nul : ombres très sombres
+    // Lumières — minimales : l'IBL (HDR) fait le travail principal comme dans Blender
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.05); // quasi nul, IBL gère l'ambiant
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 4.0); // très forte, quasi verticale
-    dirLight.position.set(2, 20, 5);  // presque directement au-dessus
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); // highlights doux depuis le haut
+    dirLight.position.set(3, 15, 5);
     scene.add(dirLight);
 
     // Pas de fill light : on veut des ombres marquées
@@ -260,7 +263,8 @@ async function initViewer() {
                             }
 
                             // ── Reflets env map ───────────────────────────────────
-                            mat.envMapIntensity = 1.5; // réduit : moins de blanc IBL, plus de contraste
+                            // Haute intensité : l'IBL domine comme dans Blender
+                            mat.envMapIntensity = 4.0;
                             mat.needsUpdate = true;
                         });
                     }
