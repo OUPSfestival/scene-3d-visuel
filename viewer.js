@@ -60,17 +60,15 @@ async function initViewer() {
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.0;
 
-    // Lumières
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Lumières — contraste fort, source principale en haut
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.15); // très faible : laisse les ombres sombres
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    dirLight.position.set(5, 10, 7);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2.5); // forte, quasi verticale
+    dirLight.position.set(2, 20, 5);  // presque directement au-dessus
     scene.add(dirLight);
 
-    const fillLight = new THREE.DirectionalLight(0x8888ff, 0.4);
-    fillLight.position.set(-5, 2, -5);
-    scene.add(fillLight);
+    // Pas de fill light : on veut des ombres marquées
 
     // Loader pour les modèles glTF / GLB
     const loader = new GLTFLoader();
@@ -262,7 +260,7 @@ async function initViewer() {
                             }
 
                             // ── Reflets env map ───────────────────────────────────
-                            mat.envMapIntensity = 3.0;
+                            mat.envMapIntensity = 1.5; // réduit : moins de blanc IBL, plus de contraste
                             mat.needsUpdate = true;
                         });
                     }
