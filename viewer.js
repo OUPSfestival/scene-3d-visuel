@@ -85,7 +85,8 @@ async function initViewer() {
 
     // Tour cinématographique
     let tourQueue = [];
-    let tourOnAllComplete = null;
+    let tourOnAllComplete  = null;
+    let tourPauseTimeout   = null;
 
     // Raycaster
     const raycaster = new THREE.Raycaster();
@@ -126,22 +127,36 @@ async function initViewer() {
             return;
         }
         const step = tourQueue.shift();
-        animateCameraTo(step.toPos, step.toTarget, step.frames, runNextTourStep);
+        animateCameraTo(step.toPos, step.toTarget, step.frames, () => {
+            if (step.pause > 0) {
+                // Pause immobile avant de passer au point suivant
+                tourPauseTimeout = setTimeout(runNextTourStep, step.pause);
+            } else {
+                runNextTourStep();
+            }
+        });
     }
 
-    // Génère les étapes du tour : 4 zones de la bounding box, chacune avec dézoom + rezoom
-    function buildTourSteps(center, size, maxDim) {
-        const hx = size.x * 0.35;
-        const hy = size.y * 0.35;
-        const hz = size.z * 0.2;
+    // Génère les étapes du tour : N zones, chacune avec dézoom lent → pause 5s → rezoom
+    // customPoints : tableau optionnel de {x,y,z} définis dans content.js
+    function buildTourSteps(center, size, maxDim, customPoints) {
+        let focuses;
 
-        // 4 zones d'intérêt réparties dans la forme
-        const focuses = [
-            new THREE.Vector3(center.x + hx * 0.55, center.y + hy * 0.55, center.z + hz * 0.2),
-            new THREE.Vector3(center.x - hx * 0.4,  center.y - hy * 0.3,  center.z + hz * 0.4),
-            new THREE.Vector3(center.x + hx * 0.05, center.y + hy * 0.05, center.z - hz * 0.3),
-            new THREE.Vector3(center.x - hx * 0.5,  center.y + hy * 0.4,  center.z + hz * 0.1),
-        ];
+        if (customPoints && customPoints.length > 0) {
+            // Points définis manuellement dans content.js → tourPoints
+            focuses = customPoints.map(p => new THREE.Vector3(p.x, p.y, p.z));
+        } else {
+            // Points auto depuis la bounding box
+            const hx = size.x * 0.35;
+            const hy = size.y * 0.35;
+            const hz = size.z * 0.2;
+            focuses = [
+                new THREE.Vector3(center.x + hx * 0.55, center.y + hy * 0.55, center.z + hz * 0.2),
+                new THREE.Vector3(center.x - hx * 0.4,  center.y - hy * 0.3,  center.z + hz * 0.4),
+                new THREE.Vector3(center.x + hx * 0.05, center.y + hy * 0.05, center.z - hz * 0.3),
+                new THREE.Vector3(center.x - hx * 0.5,  center.y + hy * 0.4,  center.z + hz * 0.1),
+            ];
+        }
 
         // Angles légèrement différents pour simuler la rotation X/Z entre chaque point
         const angles = [
@@ -153,8 +168,8 @@ async function initViewer() {
 
         const steps = [];
         focuses.forEach((focus, i) => {
-            const a = angles[i];
-            // Étape 1 : dézoom — approche lointaine
+            const a = angles[i % angles.length];
+            // Étape 1 : dézoom — transition lente depuis la zone précédente
             const farDist = maxDim * 1.3;
             steps.push({
                 toTarget: focus,
@@ -163,9 +178,10 @@ async function initViewer() {
                     focus.y + a.dy * farDist,
                     focus.z + a.dz * farDist
                 ),
-                frames: 130
+                frames: 200,
+                pause: 0
             });
-            // Étape 2 : rezoom — rapprochement serré
+            // Étape 2 : rezoom — rapprochement serré, puis pause 5s
             const closeDist = maxDim * 0.72;
             steps.push({
                 toTarget: focus,
@@ -174,11 +190,12 @@ async function initViewer() {
                     focus.y + a.dy * closeDist,
                     focus.z + a.dz * closeDist
                 ),
-                frames: 110
+                frames: 180,
+                pause: 5000
             });
         });
 
-        return steps; // 8 étapes au total
+        return steps;
     }
 
     // Fonction pour charger et afficher un modèle depuis une URL
@@ -296,6 +313,9 @@ async function initViewer() {
         raycaster.setFromCamera(mouse, camera);
         const hits = raycaster.intersectObjects(clickableObjects, true);
         if (hits.length > 0) {
+            // Logger les coordonnées du point cliqué → à copier dans content.js > tourPoints
+            const pt = hits[0].point;
+            console.log(`🎯 Point cliqué : { x: ${pt.x.toFixed(3)}, y: ${pt.y.toFixed(3)}, z: ${pt.z.toFixed(3)} }`);
             // Remonter jusqu'au premier ancêtre nommé
             let target = hits[0].object;
             while (target.parent && target.parent !== currentModel && !target.name) {
@@ -314,13 +334,25 @@ async function initViewer() {
         overviewPos.copy(camera.position);
         overviewTarget.copy(controls.target);
 
-        const box    = new THREE.Box3().setFromObject(obj);
-        const center = box.getCenter(new THREE.Vector3());
-        const size   = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
+        const box      = new THREE.Box3().setFromObject(obj);
+        const bbCenter = box.getCenter(new THREE.Vector3());
+        const size     = box.getSize(new THREE.Vector3());
+        const maxDim   = Math.max(size.x, size.y, size.z);
 
-        // Lancer le tour cinématographique sur les détails de la forme
-        tourQueue = buildTourSteps(center, size, maxDim);
+        // Récupérer le contenu en premier (pour lire tourPoints et center)
+        const content = CONTENT[obj.name] || CONTENT['__default__'] || {
+            title: obj.name || 'Forme',
+            description: '',
+            figures: []
+        };
+
+        // Centre : depuis content.js ou bounding box automatique
+        const center = content.center
+            ? new THREE.Vector3(content.center.x, content.center.y, content.center.z)
+            : bbCenter;
+
+        // Lancer le tour cinématographique (avec tourPoints personnalisés si définis)
+        tourQueue = buildTourSteps(center, size, maxDim, content.tourPoints);
         tourOnAllComplete = () => {
             // Orbite libre autour de la forme après le tour
             controls.minDistance = maxDim * 0.4;
@@ -329,11 +361,6 @@ async function initViewer() {
         };
         runNextTourStep();
 
-        const content = CONTENT[obj.name] || CONTENT['__default__'] || {
-            title: obj.name || 'Forme',
-            description: '',
-            figures: []
-        };
         showDetailPanel(content);
     }
 
@@ -341,7 +368,8 @@ async function initViewer() {
     function exitDetailView() {
         isDetailView = false;
         controls.enabled = false;
-        // Annuler le tour en cours
+        // Annuler le tour en cours (y compris toute pause setTimeout en attente)
+        if (tourPauseTimeout) { clearTimeout(tourPauseTimeout); tourPauseTimeout = null; }
         tourQueue = [];
         tourOnAllComplete = null;
         hideDetailPanel();
