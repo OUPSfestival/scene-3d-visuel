@@ -46,9 +46,9 @@ export const CONTENT = {
         // Points de zoom manuels (console → 🎯 Point cliqué)
         // Supprime ces lignes pour utiliser les points automatiques
         tourPoints: [
-            { x: 0.000, y: 0.000, z: 0.000 },  // ← remplace par tes coordonnées
-            { x: 0.000, y: 0.000, z: 0.000 },
-            { x: 0.000, y: 0.000, z: 0.000 },
+            { x: -6.144, y:  9.392, z: 2.984 },
+            { x: -4.573, y:  6.990, z: 3.030 },
+            { x: -5.709, y: 11.135, z: 2.839 },
         ],
 
         // Centre de la forme (optionnel, auto si absent)
