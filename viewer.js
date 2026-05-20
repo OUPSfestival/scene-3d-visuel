@@ -236,19 +236,32 @@ async function initViewer() {
                 originalMaxDist = controls.maxDistance;
                 controls.update();
 
-                // Forcer la transparence sur tous les matériaux qui en ont besoin
-                // (inclut les matériaux déjà marqués transparent par GLTFLoader via alphaMode:BLEND)
+                // Matériaux : transparence, IOR élevé, reflets
                 model.traverse((node) => {
                     if (node.isMesh) {
-                        const materials = Array.isArray(node.material) ? node.material : [node.material];
-                        materials.forEach((mat) => {
+                        const mats = Array.isArray(node.material) ? node.material : [node.material];
+                        mats.forEach((mat) => {
+                            // ── Diagnostic ───────────────────────────────────────
+                            const matType = mat.isMeshPhysicalMaterial  ? 'MeshPhysicalMaterial'
+                                          : mat.isMeshStandardMaterial   ? 'MeshStandardMaterial'
+                                          : mat.type;
+                            console.log(`Mat "${mat.name}" → ${matType} | metalness=${mat.metalness?.toFixed(2)} roughness=${mat.roughness?.toFixed(2)} ior=${mat.ior ?? 'n/a'} opacity=${mat.opacity.toFixed(2)}`);
+
+                            // ── Transparence ─────────────────────────────────────
                             if (mat.transparent || mat.opacity < 1 || mat.alphaMap || mat.alphaTest > 0) {
                                 mat.transparent = true;
-                                mat.depthWrite = false;
-                                mat.needsUpdate = true;
+                                mat.depthWrite  = false;
                             }
-                            // Booster les reflets env map pour simuler l'effet IOR élevé (chrome)
-                            // IOR 58 = f0 ≈ 0.93 → réflectivité miroir à toutes les incidences
+
+                            // ── IOR 58 : forcer sur MeshPhysicalMaterial ─────────
+                            // GLTFLoader crée MeshPhysicalMaterial seulement si KHR_materials_ior
+                            // est présent dans le GLB. Si le type est Standard, l'IOR est ignoré.
+                            if (mat.isMeshPhysicalMaterial) {
+                                mat.ior = 58.3;
+                                console.log(`  → IOR forcé à 58.3 sur "${mat.name}"`);
+                            }
+
+                            // ── Reflets env map ───────────────────────────────────
                             mat.envMapIntensity = 3.0;
                             mat.needsUpdate = true;
                         });
