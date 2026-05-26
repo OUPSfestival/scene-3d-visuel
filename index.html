@@ -6,6 +6,7 @@
     <title>Scène 3D</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 17px; } /* base pour les grands écrans — modifier ici pour tout rescaler */
         body { overflow: hidden; background: #1a1a2e; font-family: system-ui, -apple-system, sans-serif; }
         canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
 
@@ -38,19 +39,20 @@
 
         /* Bouton retour */
         #back-btn {
-            position: absolute; top: 30px; left: 30px;
+            position: absolute; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
             background: none; border: none; cursor: pointer; padding: 0;
-            width: 64px; height: 64px;
+            width: 80px; height: 80px;
             display: flex; align-items: center; justify-content: center;
             pointer-events: all;
         }
-        #back-btn svg { transition: transform 0.2s; }
-        #back-btn:hover svg { transform: translateX(-5px); }
+        #back-btn img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.2s; filter: brightness(0) invert(1); }
+        #back-btn:hover img { transform: translateY(4px); }
 
         /* Texte bas-gauche */
         #detail-text {
             position: absolute; bottom: 50px; left: 44px;
-            max-width: 440px; color: white; pointer-events: none;
+            max-width: 560px; color: white; pointer-events: none;
         }
         #detail-title {
             font-size: 2rem; font-weight: bold; font-style: italic;
@@ -66,9 +68,9 @@
 
         /* Panneau images droite */
         #detail-images {
-            position: absolute; top: 0; right: 0; bottom: 0; width: 340px;
+            position: absolute; top: 0; right: 0; bottom: 0; width: 480px;
             overflow-y: auto; padding: 24px 18px;
-            transform: translateX(340px);
+            transform: translateX(480px);
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: all;
         }
@@ -131,9 +133,7 @@
     <!-- Overlay détail : visible au clic sur une forme -->
     <div id="detail-view">
         <button id="back-btn" aria-label="Retour">
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M38 16 L18 32 L38 48" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <img src="assets/flechecompile.gif" alt="Retour">
         </button>
         <div id="detail-text">
             <h2 id="detail-title"></h2>

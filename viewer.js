@@ -25,7 +25,7 @@ async function initViewer() {
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio * 1.5, 3));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.78;
@@ -62,6 +62,9 @@ async function initViewer() {
     controls.dampingFactor = 0.08;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.0;
+    // Navigation tactile : 1 doigt = rotation, 2 doigts = zoom + déplacement
+    controls.touches.ONE = THREE.TOUCH.ROTATE;
+    controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
 
     // Lumières — minimales : l'IBL (HDR) fait le travail principal comme dans Blender
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.03); // quasi nul, IBL gère l'ambiant
@@ -109,6 +112,29 @@ async function initViewer() {
     let mouseDownX = 0, mouseDownY = 0;
     // Distances min/max originales (restaurées au retour)
     let originalMinDist = 0, originalMaxDist = 0;
+    // Position d'accueil (vue d'ensemble, toutes les formes cadrées)
+    const homePos    = new THREE.Vector3();
+    const homeTarget = new THREE.Vector3();
+    // Timer d'inactivité → retour automatique à l'accueil + auto-rotate
+    let idleTimer = null;
+    const IDLE_TIMEOUT = 45000; // 45s sans interaction
+
+    // Retour automatique à la vue d'ensemble après inactivité
+    function resetIdleTimer() {
+        if (!originalMinDist) return; // modèle pas encore chargé
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+            if (isDetailView) return;
+            controls.enabled = false;
+            controls.autoRotate = false;
+            animateCameraTo(homePos, homeTarget, 120, () => {
+                controls.minDistance = originalMinDist;
+                controls.maxDistance = originalMaxDist;
+                controls.autoRotate = true;
+                controls.enabled = true;
+            });
+        }, IDLE_TIMEOUT);
+    }
 
     // Easing pour l'animation caméra
     function easeInOut(t) {
@@ -148,7 +174,7 @@ async function initViewer() {
         });
     }
 
-    // Génère les étapes du tour : N zones, chacune avec dézoom lent → pause 5s → rezoom
+    // Génère les étapes du tour : zoom direct sur chaque point d'intérêt, pause 5s, puis suivant
     // customPoints : tableau optionnel de {x,y,z} définis dans content.js
     function buildTourSteps(center, size, maxDim, customPoints) {
         let focuses;
@@ -169,7 +195,7 @@ async function initViewer() {
             ];
         }
 
-        // Angles légèrement différents pour simuler la rotation X/Z entre chaque point
+        // Angles légèrement différents pour varier les axes de vue
         const angles = [
             { dx: -0.15, dy:  0.08, dz:  0.95 },
             { dx:  0.22, dy: -0.06, dz:  0.88 },
@@ -180,19 +206,7 @@ async function initViewer() {
         const steps = [];
         focuses.forEach((focus, i) => {
             const a = angles[i % angles.length];
-            // Étape 1 : dézoom — transition lente depuis la zone précédente
-            const farDist = maxDim * 1.3;
-            steps.push({
-                toTarget: focus,
-                toPos: new THREE.Vector3(
-                    focus.x + a.dx * farDist,
-                    focus.y + a.dy * farDist,
-                    focus.z + a.dz * farDist
-                ),
-                frames: 200,
-                pause: 0
-            });
-            // Étape 2 : rezoom — rapprochement serré, puis pause 5s
+            // Zoom direct sur le point → pause 5s (pas de dézoom intermédiaire)
             const closeDist = maxDim * 0.72;
             steps.push({
                 toTarget: focus,
@@ -201,7 +215,7 @@ async function initViewer() {
                     focus.y + a.dy * closeDist,
                     focus.z + a.dz * closeDist
                 ),
-                frames: 180,
+                frames: 150,
                 pause: 5000
             });
         });
@@ -234,7 +248,7 @@ async function initViewer() {
 
                 // Ajuster la caméra selon la taille du modèle
                 const maxDim = Math.max(size.x, size.y, size.z);
-                const distance = maxDim * 2;
+                const distance = maxDim * 0.45;
                 camera.position.set(distance * 0.7, distance * 0.5, distance);
                 camera.near = maxDim * 0.001;
                 camera.far = maxDim * 100;
@@ -246,6 +260,11 @@ async function initViewer() {
                 originalMinDist = controls.minDistance;
                 originalMaxDist = controls.maxDistance;
                 controls.update();
+
+                // Sauvegarder la position d'accueil (cadrage toutes les formes)
+                homePos.set(distance * 0.7, distance * 0.5, distance);
+                homeTarget.set(0, 0, 0);
+                resetIdleTimer();
 
                 // Matériaux : transparence, IOR élevé, reflets
                 model.traverse((node) => {
@@ -290,10 +309,14 @@ async function initViewer() {
 
                 scene.add(model);
 
-                // Collecter les objets cliquables et loguer leurs noms
+                // Collecter les objets cliquables (hors meshes "text" de Blender)
                 clickableObjects = [];
                 model.traverse((node) => {
                     if (node.isMesh || node.isLine) {
+                        if (node.name.toLowerCase() === 'text') {
+                            console.log(`🚫 Exclu du raycasting : "${node.name}"`);
+                            return;
+                        }
                         clickableObjects.push(node);
                         console.log(`📦 Objet : "${node.name}" (${node.isMesh ? 'Mesh' : 'Line'})`);
                     }
@@ -324,6 +347,7 @@ async function initViewer() {
         mouseDownX = e.clientX;
         mouseDownY = e.clientY;
         isDragging = false;
+        resetIdleTimer();
     });
 
     // ── Hover : curseur pointer sur les objets ───────────────
@@ -378,7 +402,6 @@ async function initViewer() {
         const size     = box.getSize(new THREE.Vector3());
         const maxDim   = Math.max(size.x, size.y, size.z);
 
-        // Récupérer le contenu en premier (pour lire tourPoints et center)
         const content = CONTENT[obj.name] || CONTENT['__default__'] || {
             title: obj.name || 'Forme',
             description: '',
@@ -390,17 +413,27 @@ async function initViewer() {
             ? new THREE.Vector3(content.center.x, content.center.y, content.center.z)
             : bbCenter;
 
-        // Lancer le tour cinématographique (avec tourPoints personnalisés si définis)
-        tourQueue = buildTourSteps(center, size, maxDim, content.tourPoints);
-        tourOnAllComplete = () => {
-            // Orbite libre autour de la forme après le tour
-            controls.minDistance = maxDim * 0.4;
-            controls.maxDistance = maxDim * 2.5;
-            controls.enabled = true;
-        };
-        runNextTourStep();
-
+        // ── Phase 1 : cadrage direct sur la forme ─────────────
+        // La caméra zoome vers la forme et le panneau s'affiche immédiatement
+        const framingDist = maxDim * 1.4;
+        const framingPos = new THREE.Vector3(
+            center.x + framingDist * 0.35,
+            center.y + framingDist * 0.25,
+            center.z + framingDist * 0.9
+        );
         showDetailPanel(content);
+        animateCameraTo(framingPos, center, 70, () => {
+            // ── Phase 2 : tour automatique des points d'intérêt ───
+            // Démarre après une courte pause une fois la forme cadrée
+            tourQueue = buildTourSteps(center, size, maxDim, content.tourPoints);
+            tourOnAllComplete = () => {
+                // Orbite libre autour de la forme après le tour
+                controls.minDistance = maxDim * 0.4;
+                controls.maxDistance = maxDim * 2.5;
+                controls.enabled = true;
+            };
+            tourPauseTimeout = setTimeout(runNextTourStep, 1200);
+        });
     }
 
     // ── Sortir de la vue détail ──────────────────────────────
@@ -457,9 +490,53 @@ async function initViewer() {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Désactiver l'auto-rotate au premier clic
+    // Désactiver l'auto-rotate à la première interaction et réarmer le timer
     controls.addEventListener('start', () => {
         controls.autoRotate = false;
+        resetIdleTimer();
+    });
+
+    // ── Navigation tactile ────────────────────────────────────
+    // Tap 1 doigt → sélectionner une forme (équivalent clic souris)
+    let touchStartX = 0, touchStartY = 0, isTouchDragging = false;
+
+    canvas.addEventListener('touchstart', (e) => {
+        resetIdleTimer();
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isTouchDragging = false;
+        } else {
+            isTouchDragging = true; // multi-touch = zoom/pan, pas un tap
+        }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+        resetIdleTimer();
+        if (e.touches.length === 1) {
+            const dx = e.touches[0].clientX - touchStartX;
+            const dy = e.touches[0].clientY - touchStartY;
+            if (Math.sqrt(dx * dx + dy * dy) > 8) isTouchDragging = true;
+        }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', (e) => {
+        if (isTouchDragging || e.changedTouches.length !== 1) return;
+        if (isDetailView) return;
+        const touch = e.changedTouches[0];
+        mouse.x =  (touch.clientX / window.innerWidth)  * 2 - 1;
+        mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const hits = raycaster.intersectObjects(clickableObjects, true);
+        if (hits.length > 0) {
+            const pt = hits[0].point;
+            console.log(`🎯 Tap : { x: ${pt.x.toFixed(3)}, y: ${pt.y.toFixed(3)}, z: ${pt.z.toFixed(3)} }`);
+            let target = hits[0].object;
+            while (target && !CONTENT[target.name] && target.parent && target.parent !== currentModel) {
+                target = target.parent;
+            }
+            enterDetailView(target);
+        }
     });
 
     // Boucle de rendu

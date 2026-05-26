@@ -105,7 +105,7 @@ export const CONTENT = {
         title: "Titre de la forme 6",
         description: "Description de cette forme.",
         figures: [],
-        center: { x: 10.341, y: -3.001, z: 2.062 },
+        center: { x: 0.362, y: -16.341, z: 4.210 },
     },
 
     // ── Forme 7 ─────────────────────────────────────────────
@@ -113,7 +113,7 @@ export const CONTENT = {
         title: "Titre de la forme 7",
         description: "Description de cette forme.",
         figures: [],
-        center: { x: 0.362, y: -16.341, z: 4.210 },
+        center: { x: 10.341, y: -3.001, z: 2.062 },
     },
 
     // ── Forme 8 ─────────────────────────────────────────────
