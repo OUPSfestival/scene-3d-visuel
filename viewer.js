@@ -33,8 +33,7 @@ async function initViewer() {
 
     // Scene
     const scene = new THREE.Scene();
-    // Fond : sera remplacé par l'HDR flouté une fois chargé (comme Blender Material Preview)
-    scene.background = new THREE.Color(0x888880);
+    scene.background = new THREE.Color(0x1a1a2e); // fond bleu nuit d'origine
 
     // Environment map HDR — reflets ET fond de scène (comme Blender)
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -44,11 +43,10 @@ async function initViewer() {
         (hdrTexture) => {
             const envMap = pmremGenerator.fromEquirectangular(hdrTexture).texture;
             scene.environment = envMap;          // IBL : reflets sur tous les matériaux PBR
-            scene.background  = envMap;          // fond de scène = même HDR
-            scene.backgroundBlurriness = 0.6;    // floué comme dans le viewport Blender
+            // fond de scène = couleur d'origine (pas l'HDR)
             hdrTexture.dispose();
             pmremGenerator.dispose();
-            console.log('✅ HDR chargé — fond + reflets actifs');
+            console.log('✅ HDR chargé — reflets actifs');
         }
     );
 
