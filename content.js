@@ -32,7 +32,7 @@
 export const CONTENT = {
 
     // ── Forme 1 ─────────────────────────────────────────────
-    "NomObjet1": {
+    "Forme1": {
         title: "Titre de la forme 1",
         description: "Description de cette forme.",
         figures: [
@@ -54,7 +54,7 @@ export const CONTENT = {
     // ── Forme 2 ─────────────────────────────────────────────
     "jets_et_conotours001": {
         title: "Ancilla",
-        description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles,\nelle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu,\ntout son contexte nécessaire d'abord, puis l'homme, puis la femme.\nL'homme doit tout dominer ce qui a été créé auparavant.\nQue l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous\ncomme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer\nde la même manière qu'elle est aimée par dieu.",
+        description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles,\nelle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu, tout son contexte nécessaire\nd'abord, puis l'homme, puis la femme. L'homme doit tout dominer\nce qui a été créé auparavant. Que l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous\ncomme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer\nde la même manière qu'elle est aimée par dieu.",
         figures: [
             {
                 image: "assets/2 1.jpg",
@@ -76,7 +76,7 @@ export const CONTENT = {
     },
 
     // ── Forme 3 ─────────────────────────────────────────────
-    "NomObjet3": {
+    "Forme3": {
         title: "Titre de la forme 3",
         description: "Description de cette forme.",
         figures: [],
@@ -84,7 +84,7 @@ export const CONTENT = {
     },
 
     // ── Forme 4 ─────────────────────────────────────────────
-    "NomObjet4": {
+    "forme4": {
         title: "Titre de la forme 4",
         description: "Description de cette forme.",
         figures: [],
@@ -92,7 +92,7 @@ export const CONTENT = {
     },
 
     // ── Forme 5 ─────────────────────────────────────────────
-    "NomObjet5": {
+    "forme5": {
         title: "Titre de la forme 5",
         description: "Description de cette forme.",
         figures: [],
@@ -100,7 +100,7 @@ export const CONTENT = {
     },
 
     // ── Forme 6 ─────────────────────────────────────────────
-    "NomObjet6": {
+    "forme6": {
         title: "Titre de la forme 6",
         description: "Description de cette forme.",
         figures: [],
@@ -108,7 +108,7 @@ export const CONTENT = {
     },
 
     // ── Forme 7 ─────────────────────────────────────────────
-    "NomObjet7": {
+    "forme7": {
         title: "Titre de la forme 7",
         description: "Description de cette forme.",
         figures: [],
@@ -116,7 +116,7 @@ export const CONTENT = {
     },
 
     // ── Forme 8 ─────────────────────────────────────────────
-    "NomObjet8": {
+    "forme8": {
         title: "Titre de la forme 8",
         description: "Description de cette forme.",
         figures: [],
@@ -124,7 +124,7 @@ export const CONTENT = {
     },
 
     // ── Forme 9 ─────────────────────────────────────────────
-    "NomObjet9": {
+    "forme9": {
         title: "Titre de la forme 9",
         description: "Description de cette forme.",
         figures: [],
