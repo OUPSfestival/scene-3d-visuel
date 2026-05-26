@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { overflow: hidden; background: #1a1a2e; font-family: system-ui, -apple-system, sans-serif; }
-        canvas { display: block; width: 100vw; height: 100vh; }
+        canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
 
 
 
@@ -78,7 +78,6 @@
         .figure-item { margin-bottom: 32px; }
         .figure-item img {
             width: 100%; display: block; object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.08);
         }
         .figure-caption { padding: 10px 2px 0; }
         .figure-caption strong {
