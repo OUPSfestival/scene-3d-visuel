@@ -54,22 +54,22 @@ export const CONTENT = {
     // ── Forme 2 ─────────────────────────────────────────────
     "jets_et_conotours001": {
         title: "Ancilla",
-        description: "Ancilla est une religieuse du couvent des Carmélites, elle a pour mission de s'occuper de son entretien.\nJe suis allé la rencontrer en sonnant à la porte, d'abord une dame m'a répondu,\nj'ai attendu une 10aine de minutes et puis Ancilla est venue m'ouvrir.\nCe schéma représente sa vision catholique de la création du monde, avec une progression, «Dieu» créa tout, en commençant par le jour et la nuit, et une fois que l'espace fut créer dans le temps, la vie avança, la nuit puis la lune. l'obscurité puis la terre. L'eau puis les animaux, la végétation. L'homme puis la femme.",
+        description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles,\nelle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu,\ntout son contexte nécessaire d'abord, puis l'homme, puis la femme.\nL'homme doit tout dominer ce qui a été créé auparavant.\nQue l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous\ncomme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer\nde la même manière qu'elle est aimée par dieu.",
         figures: [
             {
                 image: "assets/2 1.jpg",
                 title: "Figure. 1",
-                caption: ""
+                caption: "La vie est créée à travers un cadre spatial, pleins d'éléments constituants son espace nécessaire à sa vie. La vie, une fois créée deviendrait créatrice à son tour."
             },
             {
                 image: "assets/2 2.png",
                 title: "Figure. 2",
-                caption: ""
+                caption: "\"Que le ciel soit\" L'action de dieu, ses paroles et ses gestes sont représentés par ces lignes qui indiquent son mouvement, au sein d'une temporalité, chaque chose est créé l'une après l'autre (dit sur 7 jours)."
             },
             {
                 image: "assets/2 3.png",
                 title: "Figure. 3",
-                caption: ""
+                caption: "Representé par ces sortes d'\"étoiles\", l'espace existe en dehors de la terre comme d'une manière pour l'équilibrer, la contenir, la porter."
             }
         ],
         center: { x: -9.860, y: 7.626, z: 1.142 },
