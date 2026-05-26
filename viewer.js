@@ -28,7 +28,7 @@ async function initViewer() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.70;
+    renderer.toneMappingExposure = 0.78;
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -64,10 +64,10 @@ async function initViewer() {
     controls.autoRotateSpeed = 1.0;
 
     // Lumières — minimales : l'IBL (HDR) fait le travail principal comme dans Blender
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.02); // quasi nul, IBL gère l'ambiant
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.03); // quasi nul, IBL gère l'ambiant
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 5.0); // lumière principale, ombres marquées
+    const dirLight = new THREE.DirectionalLight(0xffffff, 3.5); // lumière principale, ombres marquées
     dirLight.position.set(8, 20, 10);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width  = 2048;
@@ -274,7 +274,7 @@ async function initViewer() {
 
                             // ── Reflets env map ───────────────────────────────────
                             // Intensité modérée : couleurs vives sans surexposition blanche
-                            mat.envMapIntensity = 0.8;
+                            mat.envMapIntensity = 1.1;
                             mat.needsUpdate = true;
                         });
                     }
