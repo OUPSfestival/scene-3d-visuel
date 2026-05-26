@@ -32,7 +32,7 @@
 export const CONTENT = {
 
     // ── Forme 1 ─────────────────────────────────────────────
-    "Forme1": {
+    "forme1": {
         title: "Titre de la forme 1",
         description: "Description de cette forme.",
         figures: [
@@ -53,7 +53,7 @@ export const CONTENT = {
     },
 
     // ── Forme 2 ─────────────────────────────────────────────
-    "jets_et_conotours001": {
+    "forme2": {
         title: "Ancilla",
         description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles, elle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu, tout son contexte nécessaire d'abord, puis l'homme, puis la femme. L'homme doit tout dominer\nce qui a été créé auparavant. Que l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous comme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer de la même manière qu'elle est aimée par dieu.",
         figures: [
@@ -77,7 +77,7 @@ export const CONTENT = {
     },
 
     // ── Forme 3 ─────────────────────────────────────────────
-    "Forme3": {
+    "forme3": {
         title: "Titre de la forme 3",
         description: "Description de cette forme.",
         figures: [],
