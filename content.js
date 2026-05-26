@@ -53,9 +53,25 @@ export const CONTENT = {
 
     // ── Forme 2 ─────────────────────────────────────────────
     "NomObjet2": {
-        title: "Titre de la forme 2",
-        description: "Description de cette forme.",
-        figures: [],
+        title: "Ancilla",
+        description: "Ancilla est une religieuse du couvent des Carmélites, elle a pour mission de s'occuper de son entretien.\nJe suis allé la rencontrer en sonnant à la porte, d'abord une dame m'a répondu,\nj'ai attendu une 10aine de minutes et puis Ancilla est venue m'ouvrir.\nCe schéma représente sa vision catholique de la création du monde, avec une progression, «Dieu» créa tout, en commençant par le jour et la nuit, et une fois que l'espace fut créer dans le temps, la vie avança, la nuit puis la lune. l'obscurité puis la terre. L'eau puis les animaux, la végétation. L'homme puis la femme.",
+        figures: [
+            {
+                image: "assets/2 1.jpg",
+                title: "Figure. 1",
+                caption: ""
+            },
+            {
+                image: "assets/2 2.png",
+                title: "Figure. 2",
+                caption: ""
+            },
+            {
+                image: "assets/2 3.png",
+                title: "Figure. 3",
+                caption: ""
+            }
+        ],
         center: { x: -9.860, y: 7.626, z: 1.142 },
     },
 
