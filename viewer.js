@@ -333,11 +333,13 @@ async function initViewer() {
             // Logger les coordonnées du point cliqué → à copier dans content.js > tourPoints
             const pt = hits[0].point;
             console.log(`🎯 Point cliqué : { x: ${pt.x.toFixed(3)}, y: ${pt.y.toFixed(3)}, z: ${pt.z.toFixed(3)} }`);
-            // Remonter jusqu'au premier ancêtre nommé
+            // Remonter jusqu'à un ancêtre dont le nom existe dans CONTENT
+            // (le mesh cliqué peut être un enfant du groupe Blender nommé)
             let target = hits[0].object;
-            while (target.parent && target.parent !== currentModel && !target.name) {
+            while (target && !CONTENT[target.name] && target.parent && target.parent !== currentModel) {
                 target = target.parent;
             }
+            console.log(`🎯 Objet résolu : "${target?.name}"`);
             enterDetailView(target);
         }
     });
