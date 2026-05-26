@@ -28,8 +28,10 @@ async function initViewer() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 0.85;
     renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     // Scene
     const scene = new THREE.Scene();
@@ -65,8 +67,18 @@ async function initViewer() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.05); // quasi nul, IBL gère l'ambiant
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); // highlights doux depuis le haut
-    dirLight.position.set(3, 15, 5);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2.5); // lumière principale, ombres marquées
+    dirLight.position.set(8, 20, 10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width  = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.camera.near = 1;
+    dirLight.shadow.camera.far  = 200;
+    dirLight.shadow.camera.left   = -60;
+    dirLight.shadow.camera.right  =  60;
+    dirLight.shadow.camera.top    =  60;
+    dirLight.shadow.camera.bottom = -60;
+    dirLight.shadow.bias = -0.001;
     scene.add(dirLight);
 
     // Pas de fill light : on veut des ombres marquées
@@ -261,10 +273,18 @@ async function initViewer() {
                             }
 
                             // ── Reflets env map ───────────────────────────────────
-                            // Haute intensité : l'IBL domine comme dans Blender
-                            mat.envMapIntensity = 4.0;
+                            // Intensité modérée : couleurs vives sans surexposition blanche
+                            mat.envMapIntensity = 1.5;
                             mat.needsUpdate = true;
                         });
+                    }
+                });
+
+                // Ombres portées sur tous les meshes
+                model.traverse((node) => {
+                    if (node.isMesh) {
+                        node.castShadow    = true;
+                        node.receiveShadow = true;
                     }
                 });
 
