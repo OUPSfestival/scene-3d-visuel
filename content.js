@@ -44,9 +44,10 @@ export const CONTENT = {
         ],
         // Points de zoom manuels (console → 🎯 Point cliqué)
         tourPoints: [
-            { x: -6.144, y:  9.392, z: 2.984 },
-            { x: -4.573, y:  6.990, z: 3.030 },
-            { x: -5.709, y: 11.135, z: 2.839 },
+            { x: -3.5,  y: 10.5, z: 3.0 },
+            { x:  1.2,  y: 13.8, z: 2.8 },
+            { x: -1.0,  y:  7.8, z: 3.2 },
+            { x:  3.0,  y: 11.5, z: 2.6 },
         ],
         center: { x: 1.057, y: 15.316, z: 1.171 },
     },
@@ -54,7 +55,7 @@ export const CONTENT = {
     // ── Forme 2 ─────────────────────────────────────────────
     "jets_et_conotours001": {
         title: "Ancilla",
-        description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles,\nelle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu, tout son contexte nécessaire\nd'abord, puis l'homme, puis la femme. L'homme doit tout dominer\nce qui a été créé auparavant. Que l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous\ncomme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer\nde la même manière qu'elle est aimée par dieu.",
+        description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles, elle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu, tout son contexte nécessaire d'abord, puis l'homme, puis la femme. L'homme doit tout dominer\nce qui a été créé auparavant. Que l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous comme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer de la même manière qu'elle est aimée par dieu.",
         figures: [
             {
                 image: "assets/2 1.jpg",

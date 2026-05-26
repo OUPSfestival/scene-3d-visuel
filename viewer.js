@@ -68,7 +68,7 @@ async function initViewer() {
     scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 3.5); // lumière principale, ombres marquées
-    dirLight.position.set(8, 6, 10);
+    dirLight.position.set(10, 1, 8);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width  = 2048;
     dirLight.shadow.mapSize.height = 2048;
