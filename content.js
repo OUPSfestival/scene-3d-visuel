@@ -42,44 +42,77 @@ export const CONTENT = {
                 caption: "Légende ou description de cette image."
             }
         ],
-
         // Points de zoom manuels (console → 🎯 Point cliqué)
-        // Supprime ces lignes pour utiliser les points automatiques
         tourPoints: [
             { x: -6.144, y:  9.392, z: 2.984 },
             { x: -4.573, y:  6.990, z: 3.030 },
             { x: -5.709, y: 11.135, z: 2.839 },
         ],
-
-        // Centre de la forme (optionnel, auto si absent)
-        // center: { x: 0, y: 0, z: 0 },
+        center: { x: 1.057, y: 15.316, z: 1.171 },
     },
 
     // ── Forme 2 ─────────────────────────────────────────────
     "NomObjet2": {
         title: "Titre de la forme 2",
         description: "Description de cette forme.",
-        figures: [
-            {
-                image: "images/figure-2-a.jpg",
-                title: "Figure. 1",
-                caption: "Légende."
-            }
-        ]
+        figures: [],
+        center: { x: -9.860, y: 7.626, z: 1.142 },
     },
 
     // ── Forme 3 ─────────────────────────────────────────────
     "NomObjet3": {
         title: "Titre de la forme 3",
         description: "Description de cette forme.",
-        figures: []
+        figures: [],
+        center: { x: 7.489, y: 6.065, z: 1.172 },
     },
 
     // ── Forme 4 ─────────────────────────────────────────────
     "NomObjet4": {
         title: "Titre de la forme 4",
         description: "Description de cette forme.",
-        figures: []
+        figures: [],
+        center: { x: -26.071, y: 2.672, z: 3.956 },
+    },
+
+    // ── Forme 5 ─────────────────────────────────────────────
+    "NomObjet5": {
+        title: "Titre de la forme 5",
+        description: "Description de cette forme.",
+        figures: [],
+        center: { x: -7.633, y: -6.501, z: 4.219 },
+    },
+
+    // ── Forme 6 ─────────────────────────────────────────────
+    "NomObjet6": {
+        title: "Titre de la forme 6",
+        description: "Description de cette forme.",
+        figures: [],
+        center: { x: 10.341, y: -3.001, z: 2.062 },
+    },
+
+    // ── Forme 7 ─────────────────────────────────────────────
+    "NomObjet7": {
+        title: "Titre de la forme 7",
+        description: "Description de cette forme.",
+        figures: [],
+        center: { x: 0.362, y: -16.341, z: 4.210 },
+    },
+
+    // ── Forme 8 ─────────────────────────────────────────────
+    "NomObjet8": {
+        title: "Titre de la forme 8",
+        description: "Description de cette forme.",
+        figures: [],
+        center: { x: 27.529, y: 2.863, z: 1.304 },
+    },
+
+    // ── Forme 9 ─────────────────────────────────────────────
+    "NomObjet9": {
+        title: "Titre de la forme 9",
+        description: "Description de cette forme.",
+        figures: [],
+        center: { x: 20.901, y: 15.591, z: 1.336 },
     },
 
     // ── Contenu par défaut (si le nom n'est pas reconnu) ─────
