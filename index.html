@@ -55,14 +55,14 @@
             max-width: 560px; color: white; pointer-events: none;
         }
         #detail-title {
-            font-size: 2rem; font-weight: bold; font-style: italic;
+            font-size: 2rem; font-style: italic;
             font-family: 'Times New Roman', Times, Georgia, serif;
             margin-bottom: 0.9rem; letter-spacing: 0.01em;
         }
         #detail-desc {
             font-size: 0.85rem; line-height: 1.75;
             font-family: 'Times New Roman', Times, Georgia, serif;
-            color: rgba(255,255,255,0.82);
+            color: rgba(255,255,255,0.92);
             white-space: pre-line;
         }
 
@@ -88,7 +88,7 @@
         }
         .figure-caption p {
             font-size: 0.73rem; line-height: 1.55;
-            color: rgba(255,255,255,0.65);
+            color: rgba(255,255,255,0.80);
         }
 
         /* Responsive mobile */
@@ -105,6 +105,57 @@
 
         /* Responsive - Téléphones */
 
+        /* ── Attract Screen (texte de présentation, longue inactivité) ── */
+        #attract-screen {
+            position: fixed; inset: 0; z-index: 25;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5vw 7vw;
+            background: rgba(26, 26, 46, 0.55);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.8s ease;
+        }
+        #attract-screen.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .attract-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5vw;
+            max-width: 1600px;
+            width: 100%;
+        }
+        .attract-col {
+            font-family: 'Times New Roman', Times, Georgia, serif;
+        }
+        .attract-col p {
+            font-size: 1rem;
+            line-height: 1.9;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 1.4rem;
+        }
+        .attract-col p.en {
+            font-style: italic;
+            color: rgba(255,255,255,0.85);
+        }
+        .attract-subtitle {
+            font-size: 1.05rem;
+            font-style: italic;
+            margin-bottom: 0.8rem;
+            color: white;
+        }
+        .attract-hint {
+            position: absolute;
+            bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.35);
+            font-family: system-ui, sans-serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -129,6 +180,25 @@
 
     <!-- Canvas pour la scène 3D -->
     <canvas id="scene3d"></canvas>
+
+    <!-- Attract screen : texte de présentation, visible après longue inactivité -->
+    <div id="attract-screen">
+        <div class="attract-columns">
+            <div class="attract-col">
+                <p>Vous voici dans un moment T, dans le temps partout à la fois, des gens partagent leurs visions de ce qu’est la vie, « comment la vie a-t-elle été créée ? ».<br>
+                Ici est la constellation de cette création du monde, mais elle est surtout le récit de la création de tous les corps, de leurs respirations à leurs destructions. Le souffle de la vie, l’écoulement de la terre, un éclair anachronique.</p>
+                <p class="attract-subtitle">Un éclair anachronique</p>
+                <p>La création est une histoire, avant tout. Rien de statique, un anachronisme béant, on revient dans le temps par tout temps, on connecte des univers ensemble : de temps, de pensées différentes. L’anachronisme est partout, comme les statues, ces monuments d’anges de la mort desquels on vit à côté sans se questionner. L’anachronisme c’est ceux qui réfléchissent aux questions de tout temps avec une pensée nouvelle, re rentrant dans le passé, le ré-investissant. La plus belle forme de recréation de la pensée.</p>
+            </div>
+            <div class="attract-col">
+                <p class="en">Here you are at a moment, everywhere in time at once, people sharing their visions of what life is. “how was life created?”.<br>
+                Here lies the constellation of this creation of the world, but above all it is the story of the creation of all the bodies, from their first breaths to their destruction. The breath of life, the flow of the earth, a flash of lightning in nothingness.</p>
+                <p class="attract-subtitle en" style="font-style:italic;">An anachronistic flash</p>
+                <p class="en">Creation is, above all, a story. Nothing static, a gaping anachronism, we travel back in time at any moment, connecting universes together: of time, of different thoughts. Anachronism is everywhere, like the statues, those monuments to the angels of death that we live alongside, without questioning them. Anachronism is those who reflect on timeless questions with a fresh perspective, re-entering the past, re-investing in it. The most beautiful form of the recreation of thought.</p>
+            </div>
+        </div>
+        <span class="attract-hint">Toucher l’écran pour explorer</span>
+    </div>
 
     <!-- Overlay détail : visible au clic sur une forme -->
     <div id="detail-view">

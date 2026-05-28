@@ -118,22 +118,36 @@ async function initViewer() {
     // Timer d'inactivité → retour automatique à l'accueil + auto-rotate
     let idleTimer = null;
     const IDLE_TIMEOUT = 45000; // 45s sans interaction
+    // Timer d'attraction → texte de présentation après longue inactivité
+    let attractTimer = null;
+    const ATTRACT_TIMEOUT = 60000; // 1 min sans interaction
+    const attractScreen = document.getElementById('attract-screen');
+
+    function showAttractScreen() {
+        if (attractScreen) attractScreen.classList.add('visible');
+    }
+    function hideAttractScreen() {
+        if (attractScreen) attractScreen.classList.remove('visible');
+    }
 
     // Retour automatique à la vue d'ensemble après inactivité
     function resetIdleTimer() {
         if (!originalMinDist) return; // modèle pas encore chargé
         clearTimeout(idleTimer);
+        clearTimeout(attractTimer);
+        hideAttractScreen();
         idleTimer = setTimeout(() => {
             if (isDetailView) return;
             controls.enabled = false;
             controls.autoRotate = false;
             animateCameraTo(homePos, homeTarget, 120, () => {
-                controls.minDistance = originalMinDist;
-                controls.maxDistance = originalMaxDist;
                 controls.autoRotate = true;
                 controls.enabled = true;
             });
         }, IDLE_TIMEOUT);
+        attractTimer = setTimeout(() => {
+            if (!isDetailView) showAttractScreen();
+        }, ATTRACT_TIMEOUT);
     }
 
     // Easing pour l'animation caméra
@@ -255,10 +269,8 @@ async function initViewer() {
                 camera.updateProjectionMatrix();
 
                 controls.target.set(0, 0, 0);
-                controls.minDistance = maxDim * 0.1;
-                controls.maxDistance = maxDim * 10;
-                originalMinDist = controls.minDistance;
-                originalMaxDist = controls.maxDistance;
+                controls.minDistance = 0;
+                controls.maxDistance = Infinity;
                 controls.update();
 
                 // Sauvegarder la position d'accueil (cadrage toutes les formes)
@@ -428,8 +440,6 @@ async function initViewer() {
             tourQueue = buildTourSteps(center, size, maxDim, content.tourPoints);
             tourOnAllComplete = () => {
                 // Orbite libre autour de la forme après le tour
-                controls.minDistance = maxDim * 0.4;
-                controls.maxDistance = maxDim * 2.5;
                 controls.enabled = true;
             };
             tourPauseTimeout = setTimeout(runNextTourStep, 1200);
@@ -447,8 +457,6 @@ async function initViewer() {
         hideDetailPanel();
         canvas.style.cursor = 'default';
         animateCameraTo(overviewPos, overviewTarget, 80, () => {
-            controls.minDistance = originalMinDist;
-            controls.maxDistance = originalMaxDist;
             controls.autoRotate = true;
             controls.enabled = true;
         });
@@ -482,6 +490,13 @@ async function initViewer() {
 
     // Bouton retour
     backBtn.addEventListener('click', () => exitDetailView());
+
+    // Attract screen : un toucher/clic cache le texte et reprend l'interaction
+    if (attractScreen) {
+        const dismissAttract = () => { hideAttractScreen(); resetIdleTimer(); };
+        attractScreen.addEventListener('click', dismissAttract);
+        attractScreen.addEventListener('touchend', dismissAttract);
+    }
 
     // ── Redimensionnement ─────────────────────────────────────
     window.addEventListener('resize', () => {
