@@ -110,9 +110,8 @@ async function initViewer() {
     // Détection drag vs clic
     let isDragging = false;
     let mouseDownX = 0, mouseDownY = 0;
-    // Distances min/max originales (restaurées au retour)
-    let originalMinDist = 0, originalMaxDist = 0;
     // Position d'accueil (vue d'ensemble, toutes les formes cadrées)
+    let isModelLoaded = false;
     const homePos    = new THREE.Vector3();
     const homeTarget = new THREE.Vector3();
     // Timer d'inactivité → retour automatique à l'accueil + auto-rotate
@@ -132,7 +131,7 @@ async function initViewer() {
 
     // Retour automatique à la vue d'ensemble après inactivité
     function resetIdleTimer() {
-        if (!originalMinDist) return; // modèle pas encore chargé
+        if (!isModelLoaded) return; // modèle pas encore chargé
         clearTimeout(idleTimer);
         clearTimeout(attractTimer);
         hideAttractScreen();
@@ -274,6 +273,7 @@ async function initViewer() {
                 controls.update();
 
                 // Sauvegarder la position d'accueil (cadrage toutes les formes)
+                isModelLoaded = true;
                 homePos.set(distance * 0.7, distance * 0.5, distance);
                 homeTarget.set(0, 0, 0);
                 resetIdleTimer();
