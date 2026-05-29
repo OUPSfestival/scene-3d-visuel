@@ -49,10 +49,12 @@
         #back-btn img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.2s; filter: brightness(0) invert(1); }
         #back-btn:hover img { transform: translateY(4px); }
 
-        /* Texte bas-gauche */
+        /* Texte bas – deux colonnes FR | EN */
         #detail-text {
-            position: absolute; bottom: 50px; left: 44px;
-            max-width: 560px; color: white; pointer-events: none;
+            position: absolute; bottom: 50px; left: 44px; right: 44px;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 6vw; align-items: end;
+            color: white; pointer-events: none;
         }
         #detail-title {
             font-size: 2rem; font-style: italic;
@@ -60,15 +62,18 @@
             margin-bottom: 0.9rem; letter-spacing: 0.01em;
         }
         #detail-desc {
-            font-size: 0.85rem; line-height: 1.75;
+            font-size: 0.85rem; line-height: 2.0;
             font-family: 'Times New Roman', Times, Georgia, serif;
             color: rgba(255,255,255,0.92);
             white-space: pre-line;
         }
-        #detail-desc .desc-en {
+        #detail-desc-en {
+            font-size: 0.85rem; line-height: 2.0;
+            font-family: 'Times New Roman', Times, Georgia, serif;
             color: rgba(255,255,255,0.70);
-            display: block;
-            margin-top: 0;
+            font-style: italic;
+            white-space: pre-line;
+            text-align: center;
         }
 
         /* Panneau images droite */
@@ -209,8 +214,11 @@
             <img src="assets/flechecompile.gif" alt="Retour">
         </button>
         <div id="detail-text">
-            <h2 id="detail-title"></h2>
-            <p id="detail-desc"></p>
+            <div id="detail-left">
+                <h2 id="detail-title"></h2>
+                <p id="detail-desc"></p>
+            </div>
+            <p id="detail-desc-en"></p>
         </div>
         <div id="detail-images">
             <div id="images-list"></div>

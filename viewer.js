@@ -13,7 +13,9 @@ async function initViewer() {
     const backBtn     = document.getElementById('back-btn');
     const detailTitle = document.getElementById('detail-title');
     const detailDesc  = document.getElementById('detail-desc');
+    const detailDescEn = document.getElementById('detail-desc-en');
     const imagesList  = document.getElementById('images-list');
+    const detailImages = document.getElementById('detail-images');
 
     // Vérifier que tous les éléments existent
     if (!canvas || !loadingEl) {
@@ -498,14 +500,15 @@ async function initViewer() {
     // ── Afficher le panneau détail ────────────────────────────
     function showDetailPanel(content) {
         detailTitle.textContent = content.title;
-        // Description : français + traduction anglaise en italique si disponible
         const fr = content.description || '';
         const en = content.descriptionEn || '';
-        detailDesc.innerHTML = fr.replace(/\n/g, '<br>')
-            + (en ? '<br><br><em class="desc-en">' + en.replace(/\n/g, '<br>') + '</em>' : '');
+        detailDesc.innerHTML = fr.replace(/\n/g, '<br>');
+        detailDescEn.innerHTML = en.replace(/\n/g, '<br>');
 
+        const figures = content.figures || [];
         imagesList.innerHTML = '';
-        (content.figures || []).forEach((fig) => {
+        detailImages.style.display = figures.length ? '' : 'none';
+        figures.forEach((fig) => {
             const item = document.createElement('div');
             item.className = 'figure-item';
             item.innerHTML = `
