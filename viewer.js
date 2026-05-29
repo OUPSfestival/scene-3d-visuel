@@ -60,7 +60,7 @@ async function initViewer() {
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.autoRotate = true;
+    controls.autoRotate = false;
     controls.autoRotateSpeed = 1.0;
     // Navigation tactile : 1 doigt = rotation, 2 doigts = zoom + déplacement
     controls.touches.ONE = THREE.TOUCH.ROTATE;
@@ -94,6 +94,11 @@ async function initViewer() {
     let clickableObjects = [];
     let isDetailView = false;
     let cameraAnim = null;
+    // Trajectoire caméra (mode idle)
+    let pathCurve = null;
+    let isPathMode = false;
+    let pathT = 0;
+    const PATH_SPEED = 0.0001; // tour complet ~167s à 60fps
     const overviewPos    = new THREE.Vector3();
     const overviewTarget = new THREE.Vector3();
 
@@ -106,6 +111,23 @@ async function initViewer() {
     const raycaster = new THREE.Raycaster();
     raycaster.params.Line = { threshold: 0.3 };
     const mouse = new THREE.Vector2();
+
+    // Points de trajectoire caméra exportés depuis Blender (axes convertis Blender→Three.js)
+    const PATH_POINTS_RAW = [
+        {"x":-16.9316,"y":3.6843,"z":-0.3064},{"x":-14.5032,"y":3.4466,"z":-0.1594},
+        {"x":-15.0184,"y":3.6434,"z":2.2715},{"x":-14.587,"y":-0.462,"z":1.5661},
+        {"x":-14.5026,"y":-2.316,"z":0.4572},{"x":-8.5254,"y":-4.781,"z":2.4291},
+        {"x":-8.4017,"y":-8.9689,"z":2.4342},{"x":-8.7898,"y":-11.6133,"z":0.5504},
+        {"x":-11.6891,"y":-12.8688,"z":4.4353},{"x":-11.3665,"y":-15.7999,"z":4.5185},
+        {"x":-2.154,"y":-17.4191,"z":4.5157},{"x":0.9027,"y":-21.2938,"z":0.8299},
+        {"x":3.1791,"y":-25.3639,"z":0.5565},{"x":2.4013,"y":-26.5078,"z":-1.0694},
+        {"x":-1.3132,"y":-25.6812,"z":0.1254},{"x":-1.8125,"y":-30.1068,"z":3.298},
+        {"x":-10.2998,"y":-28.7443,"z":2.0813},{"x":-17.0063,"y":-28.4908,"z":1.304},
+        {"x":-21.9198,"y":-23.2969,"z":3.393},{"x":-22.5327,"y":-21.9714,"z":-0.7727},
+        {"x":-22.1101,"y":-18.0326,"z":0.1591},{"x":-28.1166,"y":-17.8748,"z":-2.8143},
+        {"x":-37.4539,"y":-10.89,"z":-7.0853},{"x":-27.3342,"y":-3.0015,"z":-1.6526},
+        {"x":-18.311,"y":6.7726,"z":3.1628},{"x":-18.889,"y":7.9051,"z":0.0442}
+    ];
 
     // Détection drag vs clic
     let isDragging = false;
@@ -132,17 +154,26 @@ async function initViewer() {
     // Retour automatique à la vue d'ensemble après inactivité
     function resetIdleTimer() {
         if (!isModelLoaded) return; // modèle pas encore chargé
+        // Stopper la trajectoire si active
+        if (isPathMode) {
+            isPathMode = false;
+            controls.enabled = true;
+            controls.target.set(0, 0, 0);
+        }
         clearTimeout(idleTimer);
         clearTimeout(attractTimer);
         hideAttractScreen();
         idleTimer = setTimeout(() => {
             if (isDetailView) return;
             controls.enabled = false;
-            controls.autoRotate = false;
-            animateCameraTo(homePos, homeTarget, 120, () => {
-                controls.autoRotate = true;
-                controls.enabled = true;
-            });
+            if (pathCurve) {
+                // Glisser vers le premier point de la trajectoire puis démarrer le vol
+                const startPos = pathCurve.getPoint(0);
+                animateCameraTo(startPos, new THREE.Vector3(0, 0, 0), 150, () => {
+                    isPathMode = true;
+                    pathT = 0;
+                });
+            }
         }, IDLE_TIMEOUT);
         attractTimer = setTimeout(() => {
             if (!isDetailView) showAttractScreen();
@@ -258,6 +289,12 @@ async function initViewer() {
                 const size = box.getSize(new THREE.Vector3());
 
                 model.position.sub(center);
+
+                // Construire la courbe de trajectoire caméra (offset identique au modèle)
+                pathCurve = new THREE.CatmullRomCurve3(
+                    PATH_POINTS_RAW.map(p => new THREE.Vector3(p.x - center.x, p.y - center.y, p.z - center.z)),
+                    true, 'catmullrom', 0.5
+                );
 
                 // Ajuster la caméra selon la taille du modèle
                 const maxDim = Math.max(size.x, size.y, size.z);
@@ -457,7 +494,6 @@ async function initViewer() {
         hideDetailPanel();
         canvas.style.cursor = 'default';
         animateCameraTo(overviewPos, overviewTarget, 80, () => {
-            controls.autoRotate = true;
             controls.enabled = true;
         });
     }
@@ -558,7 +594,15 @@ async function initViewer() {
     function animate() {
         requestAnimationFrame(animate);
 
-        // Animation caméra fluide
+        // Trajectoire caméra idle
+        if (isPathMode && !cameraAnim) {
+            pathT = (pathT + PATH_SPEED) % 1;
+            camera.position.copy(pathCurve.getPoint(pathT));
+            camera.lookAt(0, 0, 0);
+            controls.target.set(0, 0, 0);
+        }
+
+        // Animation caméra fluide (transition)
         if (cameraAnim) {
             cameraAnim.progress += 1 / cameraAnim.frames;
             const t = easeInOut(Math.min(cameraAnim.progress, 1));
@@ -571,7 +615,7 @@ async function initViewer() {
             }
         }
 
-        controls.update();
+        if (!isPathMode) controls.update();
         renderer.render(scene, camera);
     }
     animate();
