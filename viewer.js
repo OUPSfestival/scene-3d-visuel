@@ -598,8 +598,11 @@ async function initViewer() {
         if (isPathMode && !cameraAnim) {
             pathT = (pathT + PATH_SPEED) % 1;
             camera.position.copy(pathCurve.getPoint(pathT));
-            camera.lookAt(0, 0, 0);
-            controls.target.set(0, 0, 0);
+            // Regarder dans la direction du mouvement (tangente légèrement en avant)
+            const lookT = (pathT + PATH_SPEED * 30) % 1;
+            const lookTarget = pathCurve.getPoint(lookT);
+            camera.lookAt(lookTarget);
+            controls.target.copy(lookTarget);
         }
 
         // Animation caméra fluide (transition)

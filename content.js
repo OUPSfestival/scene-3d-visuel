@@ -33,7 +33,7 @@ export const CONTENT = {
 
     // ── Forme 1 ─────────────────────────────────────────────
     "forme1": {
-        title: "Titre de la forme 1",
+        title: "Ancilla et Océane",
         description: "Description de cette forme.",
         figures: [
             {
@@ -78,7 +78,7 @@ export const CONTENT = {
 
     // ── Forme 3 ─────────────────────────────────────────────
     "forme3": {
-        title: "Titre de la forme 3",
+        title: "Océane",
         description: "Description de cette forme.",
         figures: [],
         center: { x: 7.489, y: 6.065, z: 1.172 },
@@ -86,7 +86,7 @@ export const CONTENT = {
 
     // ── Forme 4 ─────────────────────────────────────────────
     "forme4": {
-        title: "Titre de la forme 4",
+        title: "Alvar et Ancilla",
         description: "Description de cette forme.",
         figures: [],
         center: { x: -26.071, y: 2.672, z: 3.956 },
@@ -94,7 +94,7 @@ export const CONTENT = {
 
     // ── Forme 5 ─────────────────────────────────────────────
     "forme5": {
-        title: "Titre de la forme 5",
+        title: "Alvar",
         description: "Description de cette forme.",
         figures: [],
         center: { x: -7.633, y: -6.501, z: 4.219 },
@@ -102,7 +102,7 @@ export const CONTENT = {
 
     // ── Forme 6 ─────────────────────────────────────────────
     "forme6": {
-        title: "Titre de la forme 6",
+        title: "Jimmy",
         description: "Description de cette forme.",
         figures: [],
         center: { x: 0.362, y: -16.341, z: 4.210 },
@@ -110,7 +110,7 @@ export const CONTENT = {
 
     // ── Forme 7 ─────────────────────────────────────────────
     "forme7": {
-        title: "Titre de la forme 7",
+        title: "Gaspar",
         description: "Description de cette forme.",
         figures: [],
         center: { x: 10.341, y: -3.001, z: 2.062 },
@@ -118,7 +118,7 @@ export const CONTENT = {
 
     // ── Forme 8 ─────────────────────────────────────────────
     "forme8": {
-        title: "Titre de la forme 8",
+        title: "Gaspar et Océane",
         description: "Description de cette forme.",
         figures: [],
         center: { x: 27.529, y: 2.863, z: 1.304 },
@@ -126,7 +126,7 @@ export const CONTENT = {
 
     // ── Forme 9 ─────────────────────────────────────────────
     "forme9": {
-        title: "Titre de la forme 9",
+        title: "Khalija",
         description: "Description de cette forme.",
         figures: [],
         center: { x: 20.901, y: 15.591, z: 1.336 },

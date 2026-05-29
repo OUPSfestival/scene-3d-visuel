@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Push to Talk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #877892;
+      --coral: #f06457;
+      --red:   #ff1500;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* ── Texte défilant ─────────────────────────────────── */
+    .scroll-bg {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .scroll-track {
+      display: flex;
+      flex-direction: column;
+      /* 2 copies identiques → on anime de 0 à -50% pour une boucle seamless */
+      animation: scrollUp 38s linear infinite;
+      will-change: transform;
+    }
+
+    @keyframes scrollUp {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-50%); }
+    }
+
+    .phrase {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(3.2rem, 13vw, 8.5rem);
+      font-weight: 900;
+      line-height: 1.02;
+      padding: 0 0.08em;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .c { color: var(--coral); }
+    .w { color: #ffffff; }
+
+    /* ── Bouton central ─────────────────────────────────── */
+    .ui {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      pointer-events: none;
+    }
+
+    .timer {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.06em;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+      min-height: 1.8em;
+      display: flex;
+      align-items: center;
+    }
+
+    #ptt-btn {
+      width:  clamp(190px, 42vw, 270px);
+      height: clamp(190px, 42vw, 270px);
+      border-radius: 50%;
+      background: var(--red);
+      border: none;
+      cursor: pointer;
+      pointer-events: all;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      outline: none;
+      box-shadow: 0 10px 50px rgba(255,21,0,0.4);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    #ptt-btn:hover {
+      filter: brightness(1.07);
+      transform: scale(1.025);
+    }
+
+    #ptt-btn.recording {
+      animation: btnPulse 0.85s ease-in-out infinite;
+      box-shadow: 0 10px 70px rgba(255,21,0,0.6);
+    }
+
+    @keyframes btnPulse {
+      0%, 100% { transform: scale(1.04); }
+      50%       { transform: scale(1.09); }
+    }
+
+    .ptt-label {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.2);
+      pointer-events: none;
+    }
+    .ptt-label.uploading { color: rgba(255,255,200,0.85); }
+    .ptt-label.done      { color: rgba(180,255,180,0.9); }
+
+    /* ── Crédit ─────────────────────────────────────────── */
+    .credit {
+      position: fixed;
+      bottom: 16px;
+      right: 18px;
+      z-index: 10;
+      font-family: system-ui, sans-serif;
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.45);
+      text-align: right;
+      line-height: 1.55;
+      pointer-events: none;
+    }
+
+    /* ── Lien admin ─────────────────────────────────────── */
+    .admin-link {
+      position: fixed;
+      top: 16px;
+      right: 18px;
+      z-index: 10;
+      font-family: system-ui, sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .admin-link:hover { color: rgba(255,255,255,0.75); }
+
+    /* ── Toast ──────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.55);
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-family: system-ui, sans-serif;
+      font-size: 0.8rem;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 200;
+      backdrop-filter: blur(8px);
+    }
+    #toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.error   { color: #ffbbbb; }
+    #toast.success { color: #aaffcc; }
+  </style>
+</head>
+<body>
+
+  <a href="admin-sounds.html" class="admin-link">Admin</a>
+
+  <!-- Fond texte défilant -->
+  <div class="scroll-bg" aria-hidden="true">
+    <div class="scroll-track" id="scroll-track"></div>
+  </div>
+
+  <!-- UI centrale -->
+  <div class="ui">
+    <div class="timer" id="timer"></div>
+    <button id="ptt-btn" aria-label="Maintenir pour enregistrer"></button>
+    <div class="ptt-label" id="ptt-label">Maintenir pour enregistrer</div>
+  </div>
+
+  <div class="credit">
+    featured in the expo "espèces compagnes"<br>
+    at espace qartier in station bourse
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    // Générer le texte défilant (2 copies identiques → boucle seamless)
+    const SEGMENTS = [
+      { text: 'hit the button',           cls: 'c' },
+      { text: 'and talk about,',          cls: 'w' },
+      { text: 'a story,',                 cls: 'c' },
+      { text: 'a memory',                 cls: 'w' },
+      { text: 'about the creation',       cls: 'c' },
+      { text: 'of life,',                 cls: 'w' },
+      { text: 'or just',                  cls: 'c' },
+      { text: 'your life in general.',    cls: 'w' },
+    ];
+
+    function buildPhrase() {
+      const div = document.createElement('div');
+      div.className = 'phrase';
+      SEGMENTS.forEach(({ text, cls }) => {
+        const span = document.createElement('span');
+        span.className = cls;
+        span.textContent = text + ' ';
+        div.appendChild(span);
+      });
+      return div;
+    }
+
+    const track = document.getElementById('scroll-track');
+    // 6 copies : animer à -50% = 3 phrases défilées, puis loop invisible
+    for (let i = 0; i < 6; i++) track.appendChild(buildPhrase());
+  </script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, orderBy, query, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsHlm5r4cUFVy1IkRMl8yzxXn1aXsZOEg",
+      authDomain: "oups-festival.firebaseapp.com",
+      projectId: "oups-festival",
+      storageBucket: "oups-festival.firebasestorage.app",
+      messagingSenderId: "231958475030",
+      appId: "1:231958475030:web:2655c7b1f7a030407ba037"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const pttBtn   = document.getElementById('ptt-btn');
+    const pttLabel = document.getElementById('ptt-label');
+    const timerEl  = document.getElementById('timer');
+
+    let mediaRecorder = null;
+    let audioChunks   = [];
+    let timerInterval = null;
+    let startTime     = 0;
+    let audioContext  = null;
+    let stream        = null;
+
+    // ── Timer ─────────────────────────────────────────────
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const m = Math.floor(elapsed / 60);
+        const s = String(elapsed % 60).padStart(2, '0');
+        timerEl.textContent = `${m}:${s}`;
+      }, 500);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+      timerEl.textContent = '';
+    }
+
+    // ── Enregistrement ────────────────────────────────────
+    async function startRecording() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      } catch {
+        showToast('Accès micro refusé', 'error');
+        return;
+      }
+
+      audioContext = new AudioContext();
+      const mimeType   = getSupportedMime();
+      const recOptions = { audioBitsPerSecond: 16000, ...(mimeType ? { mimeType } : {}) };
+      mediaRecorder  = new MediaRecorder(stream, recOptions);
+      audioChunks    = [];
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.start(100);
+
+      pttBtn.classList.add('recording');
+      pttLabel.className   = 'ptt-label';
+      pttLabel.textContent = 'Enregistrement…';
+      startTimer();
+    }
+
+    async function stopRecording() {
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+
+      pttBtn.classList.remove('recording');
+      pauseTimer();
+
+      await new Promise(resolve => {
+        mediaRecorder.onstop = resolve;
+        mediaRecorder.stop();
+      });
+
+      stream.getTracks().forEach(t => t.stop());
+      audioContext.close();
+
+      const duration = Math.round((Date.now() - startTime) / 1000);
+      if (audioChunks.length === 0 || duration < 1) {
+        showToast('Trop court', 'error');
+        setLabelIdle();
+        return;
+      }
+
+      uploadAudio(duration);
+    }
+
+    function setLabelIdle() {
+      pttLabel.className   = 'ptt-label';
+      pttLabel.textContent = 'Maintenir pour enregistrer';
+      resetTimer();
+    }
+
+    // ── Upload Base64 → Firestore ─────────────────────────
+    async function uploadAudio(duration) {
+      pttLabel.className   = 'ptt-label uploading';
+      pttLabel.textContent = 'Envoi…';
+
+      const mimeType = getSupportedMime() || 'audio/webm';
+      const ext      = mimeType.includes('ogg') ? 'ogg' : mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const filename = `sound_${Date.now()}.${ext}`;
+      const blob     = new Blob(audioChunks, { type: mimeType });
+
+      if (blob.size > 700_000) {
+        showToast('Trop long (max ~5 min)', 'error');
+        setLabelIdle();
+        return;
+      }
+
+      try {
+        const base64 = await blobToBase64(blob);
+        await addDoc(collection(db, 'sounds'), {
+          audioData: base64, mimeType, filename, duration,
+          createdAt: serverTimestamp()
+        });
+
+        pttLabel.className   = 'ptt-label done';
+        pttLabel.textContent = 'Sauvegardé ✓';
+        showToast('Enregistrement sauvegardé !', 'success');
+        setTimeout(setLabelIdle, 2200);
+      } catch (err) {
+        showToast('Erreur : ' + err.message, 'error');
+        setTimeout(setLabelIdle, 3000);
+      }
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload  = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+      });
+    }
+
+    function getSupportedMime() {
+      const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+      return types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+    }
+
+    // ── Événements ────────────────────────────────────────
+    pttBtn.addEventListener('mousedown',  e => { e.preventDefault(); startRecording(); });
+    pttBtn.addEventListener('mouseup',    e => { e.preventDefault(); stopRecording(); });
+    pttBtn.addEventListener('mouseleave', e => { e.preventDefault(); stopRecording(); });
+    pttBtn.addEventListener('touchstart', e => { e.preventDefault(); startRecording(); }, { passive: false });
+    pttBtn.addEventListener('touchend',   e => { e.preventDefault(); stopRecording(); },  { passive: false });
+
+    // ── Toast ─────────────────────────────────────────────
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className   = 'show ' + type;
+      setTimeout(() => { t.className = type; }, 3200);
+    }
+  </script>
+</body>
+</html>
