@@ -42,12 +42,10 @@ export const CONTENT = {
                 caption: "Légende ou description de cette image."
             }
         ],
-        // Points de zoom manuels (console → 🎯 Point cliqué)
-        tourPoints: [
-            { x: -3.5,  y: 10.5, z: 3.0 },
-            { x:  1.2,  y: 13.8, z: 2.8 },
-            { x: -1.0,  y:  7.8, z: 3.2 },
-            { x:  3.0,  y: 11.5, z: 2.6 },
+        cameraViews: [
+            { position: { x: -16.8727, y: 7.0429,  z: 10.3153 }, target: { x: -17.0821, y: 6.9731,  z: -4.6831 } },
+            { position: { x: -16.4322, y: 2.0926,  z:  2.3214 }, target: { x: -18.5229, y: 12.2986, z: -8.4705 } },
+            { position: { x: -16.7079, y: 5.1233,  z: 11.3735 }, target: { x: -16.9174, y: 5.0535,  z: -3.6248 } },
         ],
         center: { x: 1.057, y: 15.316, z: 1.171 },
     },
@@ -57,6 +55,11 @@ export const CONTENT = {
         title: "Ancilla",
         description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles, elle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu, tout son contexte nécessaire d'abord, puis l'homme, puis la femme. L'homme doit tout dominer\nce qui a été créé auparavant. Que l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous comme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer de la même manière qu'elle est aimée par dieu.",
         descriptionEn: "Ancilla is a nun at the Carmelite monastery in Saint-Gilles; she considers God her best friend and is learning to play piano.\nFor her, life was created by God — first its necessary context, then man, then woman. Man must dominate all that was created before him. Man is to be the master of everything.\n\nIn this vision, God would need us just as we need him — that is why he would have created life: made to love, in the same way that it is loved by God.",
+        cameraViews: [
+            { position: { x: -31.9978, y: -3.4102, z:  2.63   }, target: { x: -23.2491, y:  2.8487, z:  -7.824  } },
+            { position: { x: -27.3823, y: -3.3281, z:  2.3214 }, target: { x: -28.5032, y: -0.7333, z: -12.4098 } },
+            { position: { x: -27.9814, y: -3.048,  z: 14.4412 }, target: { x: -28.1908, y: -3.1178, z:  -0.5572 } },
+        ],
         figures: [
             {
                 image: "assets/2 1.jpg",
@@ -141,7 +144,7 @@ export const CONTENT = {
     // ── Forme 8 ─────────────────────────────────────────────
     "forme8": {
         title: "Gaspar et Océane",
-        description: "Description de cette forme.",
+        description: "",
         figures: [],
         center: { x: 27.529, y: 2.863, z: 1.304 },
     },

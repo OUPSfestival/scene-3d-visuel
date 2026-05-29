@@ -220,9 +220,19 @@ async function initViewer() {
         });
     }
 
-    // Génère les étapes du tour : zoom direct sur chaque point d'intérêt, pause 5s, puis suivant
-    // customPoints : tableau optionnel de {x,y,z} définis dans content.js
-    function buildTourSteps(center, size, maxDim, customPoints) {
+    // customPoints : tourPoints legacy ({x,y,z} cibles seules)
+    // cameraViews  : [{position, target}] depuis Blender (prioritaire)
+    function buildTourSteps(center, size, maxDim, customPoints, cameraViews) {
+        // ── Vues Blender : position + target explicites ───────
+        if (cameraViews && cameraViews.length > 1) {
+            // On saute la première (déjà utilisée comme cadrage initial)
+            return cameraViews.slice(1).map(v => ({
+                toPos:    new THREE.Vector3(v.position.x, v.position.y, v.position.z),
+                toTarget: new THREE.Vector3(v.target.x,   v.target.y,   v.target.z),
+                frames: 150,
+                pause:  5000
+            }));
+        }
         let focuses;
 
         if (customPoints && customPoints.length > 0) {
@@ -465,20 +475,19 @@ async function initViewer() {
             : bbCenter;
 
         // ── Phase 1 : cadrage direct sur la forme ─────────────
-        // La caméra zoome vers la forme et le panneau s'affiche immédiatement
-        const framingDist = maxDim * 1.4;
-        const framingPos = new THREE.Vector3(
-            center.x + framingDist * 0.35,
-            center.y + framingDist * 0.25,
-            center.z + framingDist * 0.9
-        );
+        // Si des vues Blender sont définies, la première sert de cadrage initial
+        const views = content.cameraViews;
+        const firstPos = views && views.length > 0
+            ? new THREE.Vector3(views[0].position.x, views[0].position.y, views[0].position.z)
+            : (() => { const d = maxDim * 1.4; return new THREE.Vector3(center.x + d*0.35, center.y + d*0.25, center.z + d*0.9); })();
+        const firstTarget = views && views.length > 0
+            ? new THREE.Vector3(views[0].target.x, views[0].target.y, views[0].target.z)
+            : center;
         showDetailPanel(content);
-        animateCameraTo(framingPos, center, 70, () => {
+        animateCameraTo(firstPos, firstTarget, 70, () => {
             // ── Phase 2 : tour automatique des points d'intérêt ───
-            // Démarre après une courte pause une fois la forme cadrée
-            tourQueue = buildTourSteps(center, size, maxDim, content.tourPoints);
+            tourQueue = buildTourSteps(center, size, maxDim, content.tourPoints, views);
             tourOnAllComplete = () => {
-                // Orbite libre autour de la forme après le tour
                 controls.enabled = true;
             };
             tourPauseTimeout = setTimeout(runNextTourStep, 1200);
