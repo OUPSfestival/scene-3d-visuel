@@ -503,7 +503,11 @@ async function initViewer() {
     // ── Afficher le panneau détail ────────────────────────────
     function showDetailPanel(content) {
         detailTitle.textContent = content.title;
-        detailDesc.textContent  = content.description;
+        // Description : français + traduction anglaise en italique si disponible
+        const fr = content.description || '';
+        const en = content.descriptionEn || '';
+        detailDesc.innerHTML = fr.replace(/\n/g, '<br>')
+            + (en ? '<br><br><em class="desc-en">' + en.replace(/\n/g, '<br>') + '</em>' : '');
 
         imagesList.innerHTML = '';
         (content.figures || []).forEach((fig) => {
