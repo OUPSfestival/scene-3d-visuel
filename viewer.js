@@ -39,6 +39,63 @@ async function initViewer() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a1a2e); // fond bleu nuit d'origine
 
+    // ── Fond étoilé — nuage de points statiques à grande distance ─────────
+    {
+        const STAR_COUNT = 3000;
+        const pos = new Float32Array(STAR_COUNT * 3);
+        for (let i = 0; i < STAR_COUNT; i++) {
+            const r     = 420 + Math.random() * 280;
+            const theta = Math.acos(2 * Math.random() - 1);
+            const phi   = Math.random() * Math.PI * 2;
+            pos[i * 3]     = r * Math.sin(theta) * Math.cos(phi);
+            pos[i * 3 + 1] = r * Math.sin(theta) * Math.sin(phi);
+            pos[i * 3 + 2] = r * Math.cos(theta);
+        }
+        const starGeo = new THREE.BufferGeometry();
+        starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const starMat = new THREE.PointsMaterial({
+            color: 0xffffff, size: 0.55,
+            sizeAttenuation: true,
+            transparent: true, opacity: 0.80,
+            depthWrite: false,
+        });
+        const stars = new THREE.Points(starGeo, starMat);
+        stars.renderOrder = -1;
+        scene.add(stars);
+    }
+
+    // ── Fond étoilé — particules statiques à grande distance ──────────
+    (function addStarfield() {
+        const COUNT = 2800;
+        const positions = new Float32Array(COUNT * 3);
+        const sizes     = new Float32Array(COUNT);
+        for (let i = 0; i < COUNT; i++) {
+            // Sphère uniforme de rayon 400–700
+            const r     = 400 + Math.random() * 300;
+            const theta = Math.acos(2 * Math.random() - 1);
+            const phi   = Math.random() * Math.PI * 2;
+            positions[i * 3]     = r * Math.sin(theta) * Math.cos(phi);
+            positions[i * 3 + 1] = r * Math.sin(theta) * Math.sin(phi);
+            positions[i * 3 + 2] = r * Math.cos(theta);
+            sizes[i] = 0.4 + Math.random() * 1.4;
+        }
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geo.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+        const mat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.75,
+        });
+        // Taille moyenne définie par la moyenne des sizes
+        mat.size = 0.9;
+        const stars = new THREE.Points(geo, mat);
+        stars.renderOrder = -1;
+        scene.add(stars);
+    })();
+    // ──────────────────────────────────────────────────────
+
     // Environment map HDR — reflets ET fond de scène (comme Blender)
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();

@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Configuration du contenu pour chaque forme de la scène 3D
 //
 // ── Trouver les noms des objets ──────────────────────────────
@@ -43,14 +43,18 @@ export const CONTENT = {
     "forme2": {
         title: "Ancilla",
         description: "Ancilla est une religieuse au monastère des carmélites à Saint-Gilles, elle considère dieu comme son meilleur ami, elle apprend le piano.\nPour elle la vie a été créé par dieu, tout son contexte nécessaire d'abord, puis l'homme, puis la femme. L'homme doit tout dominer\nce qui a été créé auparavant. Que l'homme soit le chef de tout.\n\nDans cette réflexion Dieu aurait besoin de nous comme on aurait besoin de lui, c'est pour ça\nqu'il aurait créé la vie, créée pour aimer de la même manière qu'elle est aimée par dieu.",
-        descriptionEn: "Ancilla is a nun at the Carmelite monastery in Saint-Gilles; she regards God as her best friend and is learning to play the piano.\nFor her, life was created by God: first all the necessary elements of the environment, then man, and then woman. Man must rule over everything that was created before him. Let man be the ruler of all.\n\nIn this line of thought, God needs us just as we need him; that is why he created life \u2014 created to love in the same way that it is loved by God.",
+        descriptionEn: "Ancilla is a nun at the Carmelite monastery in Saint-Gilles; she regards God as her best friend and is learning to play the piano.\nFor her, life was created by God: first all the necessary elements of the environment, then man, and then woman. Man must rule over everything that was created before him. Let man be the ruler of all.\n\nIn this line of thought, God needs us just as we need him; that is why he created life, created to love in the same way that it is loved by God.",
+        figures: [],
+        center: { x: -9.860, y: 7.626, z: 1.142 },
     },
 
     // ── Forme 3 ─────────────────────────────────────────────
     "forme3": {
         title: "Océane — tout le temps, pendant ou avant",
         description: "Océane est une artiste liée au vivant, inconstante et pyromane. La vie s'incarne dans quelque chose de matériel, un corps, celui-ci possède un esprit, mais rien n'est aussi infini que la vie. Elle traverse le temps, l'espace pour s'incarner, la rencontre de deux éléments, pour exister à travers ce que nous nous voyons, l'univers de la forme. Beaucoup de choses englobent la vie qu'on ne prend pas en compte, les âmes choisissent leur support de vie. La vie est la rencontre à mi-chemin des choses, l'amour.",
-        descriptionEn: "Océane is an artist connected to the living world, erratic and a firestarter. Life takes on a material form \u2014 a body \u2014 which carries a spirit, yet nothing is as infinite as life itself. It crosses time and space to incarnate: the meeting of two elements, to exist through what we perceive \u2014 the universe of form. Many things that encompass life go unnoticed; souls choose the vessel through which they live. Life is the meeting halfway between things \u2014 it is love.",
+        descriptionEn: "Océane is an artist connected to the living world, erratic and a firestarter. Life takes on a material form, a body, which carries a spirit, yet nothing is as infinite as life itself. It crosses time and space to incarnate: the meeting of two elements, to exist through what we perceive, the universe of form. Many things that encompass life go unnoticed; souls choose the vessel through which they live. Life is the meeting halfway between things, it is love.",
+        figures: [],
+        center: { x: 7.489, y: 6.065, z: 1.172 },
     },
 
     // ── Forme 4 ─────────────────────────────────────────────
@@ -65,21 +69,27 @@ export const CONTENT = {
     "forme5": {
         title: "Alvar — pendant ou après",
         description: "Alvar est chercheur et ancien botaniste à Madrid, obsédé par les séquences des choses et leur profondeur. La vie émerge spontanément, les molécules apparaissent depuis la foudre qui tombe et celle-ci se modifie en explorant. La vie se forme de ces ramifications, de cette apparition spontanée de forces inattendues s'exerçant constamment. La vie existe donc par stade, par \"méta\" exprimant toutes une nécessité de vivre de s'exprimer à travers ce qu'il lui est offert.\n\nLe schéma prend au final une forme de molécules elle même.\n\nLa vie est donc l'apparition carnée, le corps.",
-        descriptionEn: "Alvar is a researcher and former botanist from Madrid, obsessed with the sequences of things and their depth. Life emerges spontaneously \u2014 molecules appear from lightning and then transform through exploration. Life takes shape through these ramifications, through this spontaneous appearance of unexpected forces constantly at work. Life therefore exists in stages, in \"metas\", each expressing a necessity to live, to express itself through what is offered to it.\n\nThe diagram ultimately takes the form of a molecule itself.\n\nLife is therefore the incarnate appearance \u2014 the body.",
+        descriptionEn: "Alvar is a researcher and former botanist from Madrid, obsessed with the sequences of things and their depth. Life emerges spontaneously, molecules appear from lightning and then transform through exploration. Life takes shape through these ramifications, through this spontaneous appearance of unexpected forces constantly at work. Life therefore exists in stages, in \"metas\", each expressing a necessity to live, to express itself through what is offered to it.\n\nThe diagram ultimately takes the form of a molecule itself.\n\nLife is therefore the incarnate appearance, the body.",
+        figures: [],
+        center: { x: -7.633, y: -6.501, z: 4.219 },
     },
 
     // ── Forme 6 ─────────────────────────────────────────────
     "forme6": {
         title: "Jimmy — tout le temps",
         description: "Jimmy est obsédé par l'apparition des étoiles, alors qu'il en avait peur avant. Les premières formes de vie, sont du mouvement, la décision inattendue, l'action des choses d'aller quelque part à un moment dans le temps.\n\nLes étoiles sont apparues bien avant nous, et elles représentent toutes nos formes du vivant. Elles sont en nombre, elles ont une enveloppe, vivante, évoluante. Elles se partagent similarités. Pourquoi on les considérait à distance de nous alors qu'elles ont subitement commencé à exister au milieu de la masse de gaz, informe de tout, de la même manière que les premières cellules vivantes se sont formées au milieu de la terre invivable.\n\nQuand je les regarde, je ne vois rien de plus vivant que les étoiles.",
-        descriptionEn: "Jimmy is obsessed with the appearance of stars, though he used to fear them. The first forms of life are movement, the unexpected decision, the action of things moving somewhere at a point in time.\n\nStars appeared long before us, and they represent all forms of living things. They are numerous; they have an envelope \u2014 living, evolving. They share similarities. Why did we consider them distant from us when they suddenly began to exist in the middle of a formless mass of gas, in the same way that the first living cells formed in the midst of an uninhabitable earth?\n\nWhen I look at them, I see nothing more alive than the stars.",
+        descriptionEn: "Jimmy is obsessed with the appearance of stars, though he used to fear them. The first forms of life are movement, the unexpected decision, the action of things moving somewhere at a point in time.\n\nStars appeared long before us, and they represent all forms of living things. They are numerous; they have an envelope, living, evolving. They share similarities. Why did we consider them distant from us when they suddenly began to exist in the middle of a formless mass of gas, in the same way that the first living cells formed in the midst of an uninhabitable earth?\n\nWhen I look at them, I see nothing more alive than the stars.",
+        figures: [],
+        center: { x: 0.362, y: -16.341, z: 4.210 },
     },
 
     // ── Forme 7 ─────────────────────────────────────────────
     "forme7": {
         title: "Gaspar — avant ou pendant",
         description: "Gaspar est un type qui crèche dans l'église saint nicolas à Paris, passionné par les mash up de barbie girl et ramstein. Dans un moment T mais de manière cyclique, les forces s'exercent, le feu, la vie et la connaissance prospèrent, s'alimentant les uns les autres. Elles créent des explosions, des événements, la vie est la représentation de ces cycles.",
-        descriptionEn: "Gaspar is a man who lives at the Saint-Nicolas church in Paris, passionate about mashups of Barbie Girl and Rammstein. At a moment T but in a cyclical way, forces are at work \u2014 fire, life, and knowledge thrive, feeding one another. They create explosions and events; life is the representation of these cycles.",
+        descriptionEn: "Gaspar is a man who lives at the Saint-Nicolas church in Paris, passionate about mashups of Barbie Girl and Rammstein. At a moment T but in a cyclical way, forces are at work, fire, life, and knowledge thrive, feeding one another. They create explosions and events; life is the representation of these cycles.",
+        figures: [],
+        center: { x: 10.341, y: -3.001, z: 2.062 },
     },
 
     // ── Forme 8 ─────────────────────────────────────────────
@@ -95,13 +105,17 @@ export const CONTENT = {
         title: "Khalija",
         description: "Khalija est une personne rencontrée sur mon lieu de travail où elle fait le ménage, elle aime parler de sa fille. On est né pour vivre, échanger, respecter, partager l'espace. Respecter la vie, laisser parler les autres. La terre elle est un cadeau pour la vie. Mais elle ne veut pas dire comment elle aurait été créée, ni y penser.",
         descriptionEn: "Khalija is a person I met at my workplace, where she works as a cleaner; she loves talking about her daughter. We are born to live, to exchange, to respect, to share space. To respect life, to let others speak. The earth is a gift for life. But she does not want to say how it was created, nor does she want to think about it.",
+        figures: [],
+        center: { x: 20.901, y: 15.591, z: 1.336 },
     },
 
     // ── Forme 10 ────────────────────────────────────────────
     "forme10": {
         title: "Ameed — tout le temps",
         description: "Ameed est un artiste tentant de représenter les formes de vie par le dessin. Bien qu'on ne puisse pas représenter la vie à son premier état, pour la première fois, l'existence s'incarne dans le tissu matériel, mais la vie appartient à un autre plan. Les pensées sont collectées, échangées, existent en tout temps, elles sont donc partagées par tous les humains, de la même manière qu'on respire l'air et l'expire, transmettant les pensées et la conscience par l'énergie.",
-        descriptionEn: "Ameed is an artist who tries to represent the forms of life through drawing. Although we cannot represent life in its first state, existence incarnates in the material fabric \u2014 yet life belongs to another plane. Thoughts are collected, exchanged, and exist at all times; they are therefore shared by all humans, in the same way that we breathe in and out, transmitting thoughts and consciousness through energy.",
+        descriptionEn: "Ameed is an artist who tries to represent the forms of life through drawing. Although we cannot represent life in its first state, existence incarnates in the material fabric, yet life belongs to another plane. Thoughts are collected, exchanged, and exist at all times; they are therefore shared by all humans, in the same way that we breathe in and out, transmitting thoughts and consciousness through energy.",
+        figures: [],
+        center: { x: 20.647, y: -13.773, z: 1.342 },
     },
 
     // ── Contenu par défaut (si le nom n'est pas reconnu) ─────
@@ -112,3 +126,4 @@ export const CONTENT = {
     }
 
 };
+
