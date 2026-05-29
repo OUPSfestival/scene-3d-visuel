@@ -154,11 +154,13 @@ async function initViewer() {
     // Retour automatique à la vue d'ensemble après inactivité
     function resetIdleTimer() {
         if (!isModelLoaded) return; // modèle pas encore chargé
-        // Stopper la trajectoire si active
+        // Stopper la trajectoire si active — repartir du point de vue courant
         if (isPathMode) {
             isPathMode = false;
             controls.enabled = true;
-            controls.target.set(0, 0, 0);
+            // Garder le target où la caméra regardait (look-ahead sur la courbe)
+            const lookT = (pathT + PATH_SPEED * 30) % 1;
+            controls.target.copy(pathCurve.getPoint(lookT));
         }
         clearTimeout(idleTimer);
         clearTimeout(attractTimer);
