@@ -43,7 +43,7 @@ async function initViewer() {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new RGBELoader().load(
-        'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/forest_slope_1k.hdr',
+        './assets/forest_slope_1k.hdr',
         (hdrTexture) => {
             const envMap = pmremGenerator.fromEquirectangular(hdrTexture).texture;
             scene.environment = envMap;          // IBL : reflets sur tous les matériaux PBR
