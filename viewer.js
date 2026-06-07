@@ -171,12 +171,9 @@ async function initViewer() {
             if (isDetailView) return;
             controls.enabled = false;
             if (pathCurve) {
-                // Glisser vers le premier point de la trajectoire puis démarrer le vol
-                const startPos = pathCurve.getPoint(0);
-                animateCameraTo(startPos, new THREE.Vector3(0, 0, 0), 150, () => {
-                    isPathMode = true;
-                    pathT = 0;
-                });
+                // Reprendre la trajectoire depuis le point courant le plus proche
+                isPathMode = true;
+                showAttractScreen();
             }
         }, IDLE_TIMEOUT);
         attractTimer = setTimeout(() => {
@@ -315,6 +312,15 @@ async function initViewer() {
                 isModelLoaded = true;
                 homePos.set(distance * 0.7, distance * 0.5, distance);
                 homeTarget.set(0, 0, 0);
+
+                // Lancer immédiatement la trajectoire et l'attract screen
+                if (pathCurve) {
+                    isPathMode = true;
+                    pathT = 0;
+                    controls.enabled = false;
+                }
+                showAttractScreen();
+                // Démarrer le timer d'inactivité (pour quand l'utilisateur interagit)
                 resetIdleTimer();
 
                 // Matériaux : transparence, IOR élevé, reflets
